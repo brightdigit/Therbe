@@ -1,8 +1,6 @@
 import Foundation
 import PlaygroundSupport
 
-print("test")
-
 extension String {
     private static let allowedCharacters = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyz0123456789-_")
     
@@ -211,15 +209,17 @@ struct MarkdownEntry {
 ---
 \(self.frontMatter.yaml)
 ---
-\(self.markdown)
+\(self.markdown.trimmingCharacters(in: .whitespacesAndNewlines))
 """
   }
 }
 
 //let photoUrlComponent = URLComponents(string: "https://picsum.photos/id/")!
+let photoURLTemplate = "https://picsum.photos/id/%d/%d/%d"
 let markdownUrl = URL(string: "https://jaspervdj.be/lorem-markdownum/markdown.txt")!
 
 let count = 20
+
 
 
 let directoryURL = playgroundSharedDataDirectory.appendingPathComponent("minues/posts", isDirectory: true)
@@ -227,7 +227,6 @@ let directoryURL = playgroundSharedDataDirectory.appendingPathComponent("minues/
 try! FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
 print(directoryURL)
 let group = DispatchGroup()
-print("test")
 PlaygroundPage.current.needsIndefiniteExecution = true
 for _ in (1...20) {
   group.enter()
@@ -250,14 +249,16 @@ for _ in (1...20) {
               foundTitle = String( markdown[result[2]])
               newMarkdown.removeSubrange(result[0])
             } else {
-              newMarkdown.insert(contentsOf: "![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)\n\n", at: result[0].lowerBound)
+              let imageAlt = markdown[result[2]]
+              let imageUrl = String(format: photoURLTemplate, Int.random(in: 1...1000), 1920, 960)
+              newMarkdown.insert(contentsOf: "![\(imageAlt)](\(imageUrl))\n\n", at: result[0].lowerBound)
             }
           }
 
           guard let title = foundTitle else {
             throw MissingTitleError()
           }
-          let frontMatter = FrontMatter(title: title, tags: ["a", "b", "c"], categories: ["a", "b", "c"], cover_image: URL(string: "https://octodex.github.com/images/yaktocat.png")!)
+          let frontMatter = FrontMatter(title: title, tags: ["a", "b", "c"], categories: ["a", "b", "c"], cover_image: URL(string: String(format: photoURLTemplate, Int.random(in: 1...1000), 1920, 960))!)
           return MarkdownEntry(frontMatter: frontMatter, markdown: newMarkdown)
         }
         
@@ -286,18 +287,3 @@ for _ in (1...20) {
 group.notify(queue: .main) {
   PlaygroundPage.current.finishExecution()
 }
-/*
- ---
- layout: post
- title:  "Welcome to Jekyll!"
- tags: []
- categories: []
- cover_image
- ---
- 
- # Welcome
- 
- **Hello world**, this is my first Jekyll blog post.
- 
- I hope you like it!
- */

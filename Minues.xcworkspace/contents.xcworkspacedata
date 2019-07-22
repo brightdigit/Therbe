@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "container:../../../../../System/Volumes/Data/Users/leo/Documents/Projects/Minues/minues-ios-app/minues-ios-app.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:Minues">
    </FileRef>
 </Workspace>

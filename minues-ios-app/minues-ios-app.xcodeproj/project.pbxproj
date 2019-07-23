@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B33CBC5322E6537A000E6925 /* Minues in Frameworks */ = {isa = PBXBuildFile; productRef = B33CBC5222E6537A000E6925 /* Minues */; };
 		B33E94FC22E61EF400AA9939 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33E94FB22E61EF400AA9939 /* AppDelegate.swift */; };
 		B33E94FE22E61EF400AA9939 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33E94FD22E61EF400AA9939 /* SceneDelegate.swift */; };
 		B33E950022E61EF400AA9939 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33E94FF22E61EF400AA9939 /* ViewController.swift */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B33CBC5122E652C4000E6925 /* Minues */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Minues; path = ../../../../../../../../../Users/leo/Documents/Projects/Minues/Minues; sourceTree = "<group>"; };
 		B33E94F822E61EF400AA9939 /* minues-ios-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "minues-ios-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B33E94FB22E61EF400AA9939 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B33E94FD22E61EF400AA9939 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -24,7 +26,6 @@
 		B33E950422E61EF900AA9939 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B33E950722E61EF900AA9939 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B33E950922E61EF900AA9939 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B33E950F22E6329000AA9939 /* BlogEntryGenerator.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; name = BlogEntryGenerator.playground; path = ../BlogEntryGenerator.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,18 +33,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B33CBC5322E6537A000E6925 /* Minues in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B33CBC5022E652C4000E6925 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B33CBC5122E652C4000E6925 /* Minues */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		B33E94EF22E61EF400AA9939 = {
 			isa = PBXGroup;
 			children = (
-				B33E950F22E6329000AA9939 /* BlogEntryGenerator.playground */,
 				B33E94FA22E61EF400AA9939 /* minues-ios-app */,
 				B33E94F922E61EF400AA9939 /* Products */,
+				B33CBC5022E652C4000E6925 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -85,6 +95,9 @@
 			dependencies = (
 			);
 			name = "minues-ios-app";
+			packageProductDependencies = (
+				B33CBC5222E6537A000E6925 /* Minues */,
+			);
 			productName = "minues-ios-app";
 			productReference = B33E94F822E61EF400AA9939 /* minues-ios-app.app */;
 			productType = "com.apple.product-type.application";
@@ -340,6 +353,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B33CBC5222E6537A000E6925 /* Minues */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Minues;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B33E94F022E61EF400AA9939 /* Project object */;
 }

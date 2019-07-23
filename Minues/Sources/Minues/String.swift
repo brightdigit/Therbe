@@ -1,6 +1,11 @@
-import Foundation
-import PlaygroundSupport
+//
+//  File.swift
+//  
+//
+//  Created by Leo Dion on 7/22/19.
+//
 
+import Foundation
 extension String {
     private static let allowedCharacters = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyz0123456789-_")
     
@@ -148,142 +153,4 @@ extension String {
             .filter { $0 != "" }
             .joined(separator: "-")
     }
-}
-struct MissingTitleError : Error {}
-struct NoDataError : Error {}
-
-infix operator =~
-func =~ (value: String, pattern: String) -> [[Range<String.Index>]] {
-  let string = value as NSString
-  let options = NSRegularExpression.Options(rawValue: 0)
-  
-  guard let regex = try? NSRegularExpression(pattern: pattern, options: options) else {
-    return [[Range<String.Index>]]()
-  }
-  
-  let all = NSRange(location: 0, length: string.length)
-  let matchingOptions = NSRegularExpression.MatchingOptions(rawValue: 0)
-  
-  return regex.matches(in: value, options: matchingOptions, range: all).map { (result) in
-    (0..<result.numberOfRanges).compactMap {
-      Range(result.range(at: $0), in: value)
-    }
-  }
-}
-
-extension Result {
-  init(value: Success?, error: Failure?, noDataError: Failure) {
-    if let error = error {
-      self = .failure(error)
-    } else if let value = value {
-      self = .success(value)
-    } else {
-      self = .failure(noDataError)
-    }
-  }
-}
-struct FrontMatter {
-  let layout: String = "post"
-  let title : String
-  let tags : [String]
-  let categories: [String]
-  let cover_image: URL
-  
-  var yaml : String {
-      return """
-layout: \(self.layout)
-title:  "\(self.title)"
-tags: \(self.tags)
-categories: \(self.categories)
-cover_image: \(self.cover_image)
-"""
-    }
-}
-
-struct MarkdownEntry {
-  let frontMatter: FrontMatter
-  let markdown: String
-  
-  var text : String {
-    return """
----
-\(self.frontMatter.yaml)
----
-\(self.markdown.trimmingCharacters(in: .whitespacesAndNewlines))
-"""
-  }
-}
-
-//let photoUrlComponent = URLComponents(string: "https://picsum.photos/id/")!
-let photoURLTemplate = "https://picsum.photos/id/%d/%d/%d"
-let markdownUrl = URL(string: "https://jaspervdj.be/lorem-markdownum/markdown.txt")!
-
-let count = 20
-
-
-
-let directoryURL = playgroundSharedDataDirectory.appendingPathComponent("minues/posts", isDirectory: true)
-
-try! FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
-print(directoryURL)
-let group = DispatchGroup()
-PlaygroundPage.current.needsIndefiniteExecution = true
-for _ in (1...20) {
-  group.enter()
-  DispatchQueue.main.async {
-    URLSession.shared.downloadTask(with: markdownUrl) { (url, _, error) in
-      let urlResult = Result(value: url, error: error, noDataError: NoDataError())
-      let stringResult = urlResult.flatMap { (downloadURL) in
-        Result{
-          try String(contentsOf: downloadURL)
-        }
-      }
-      let entryResult = stringResult.flatMap { (markdown) in
-        return Result { () -> MarkdownEntry in
-          var foundTitle: String?
-          var newMarkdown = markdown
-          let results = markdown =~ "(#+)\\s(.+)"
-          for result in results.reversed() {
-            
-            if markdown[result[1]].count == 1 {
-              foundTitle = String( markdown[result[2]])
-              newMarkdown.removeSubrange(result[0])
-            } else {
-              let imageAlt = markdown[result[2]]
-              let imageUrl = String(format: photoURLTemplate, Int.random(in: 1...1000), 1920, 960)
-              newMarkdown.insert(contentsOf: "![\(imageAlt)](\(imageUrl))\n\n", at: result[0].lowerBound)
-            }
-          }
-
-          guard let title = foundTitle else {
-            throw MissingTitleError()
-          }
-          let frontMatter = FrontMatter(title: title, tags: ["a", "b", "c"], categories: ["a", "b", "c"], cover_image: URL(string: String(format: photoURLTemplate, Int.random(in: 1...1000), 1920, 960))!)
-          return MarkdownEntry(frontMatter: frontMatter, markdown: newMarkdown)
-        }
-        
-      }
-      
-      let entry : MarkdownEntry
-      do {
-      entry = try entryResult.get()
-      } catch let error {
-        debugPrint(error)
-        return
-      }
-      let fileName = entry.frontMatter.title.slugify() + ".md"
-      do {
-      try entry.text.write(to: directoryURL.appendingPathComponent(fileName), atomically: false, encoding: .utf8)
-        
-      } catch let error {
-        debugPrint(error)
-        return
-      }
-      group.leave()
-    }.resume()
-  }
-}
-
-group.notify(queue: .main) {
-  PlaygroundPage.current.finishExecution()
 }

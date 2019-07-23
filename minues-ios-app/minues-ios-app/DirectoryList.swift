@@ -6,6 +6,7 @@
 //  Copyright © 2019 BrightDigit. All rights reserved.
 //
 
+import Minues
 import SwiftUI
 
 struct DirectoryList: View {
@@ -18,7 +19,17 @@ struct DirectoryList: View {
     }
   
   func generate () {
+    let documentDirectoryUrls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+    guard let documentDirURL = documentDirectoryUrls.first else {
+      return
+    }
+    let markdownDirectoryURL = documentDirURL.appendingPathComponent("sites", isDirectory: true).appendingPathComponent("sample", isDirectory: true).appendingPathComponent("posts", isDirectory: true)
     
+    print(markdownDirectoryURL)
+    try! FileManager.default.createDirectory(at: markdownDirectoryURL, withIntermediateDirectories: true, attributes: nil)
+    let generator = Generator.generate(20, markdownFilesAt: markdownDirectoryURL) { (result) in
+      print(result)
+      }
   }
 }
 

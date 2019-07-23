@@ -10,10 +10,9 @@
 		B33CBC5322E6537A000E6925 /* Minues in Frameworks */ = {isa = PBXBuildFile; productRef = B33CBC5222E6537A000E6925 /* Minues */; };
 		B33E94FC22E61EF400AA9939 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33E94FB22E61EF400AA9939 /* AppDelegate.swift */; };
 		B33E94FE22E61EF400AA9939 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33E94FD22E61EF400AA9939 /* SceneDelegate.swift */; };
-		B33E950022E61EF400AA9939 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33E94FF22E61EF400AA9939 /* ViewController.swift */; };
-		B33E950322E61EF400AA9939 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B33E950122E61EF400AA9939 /* Main.storyboard */; };
 		B33E950522E61EF900AA9939 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B33E950422E61EF900AA9939 /* Assets.xcassets */; };
 		B33E950822E61EF900AA9939 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B33E950622E61EF900AA9939 /* LaunchScreen.storyboard */; };
+		B3FC529022E73C1C00C14386 /* DirectoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3FC528F22E73C1C00C14386 /* DirectoryList.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,11 +20,10 @@
 		B33E94F822E61EF400AA9939 /* minues-ios-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "minues-ios-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B33E94FB22E61EF400AA9939 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B33E94FD22E61EF400AA9939 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		B33E94FF22E61EF400AA9939 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		B33E950222E61EF400AA9939 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B33E950422E61EF900AA9939 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B33E950722E61EF900AA9939 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B33E950922E61EF900AA9939 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B3FC528F22E73C1C00C14386 /* DirectoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,11 +68,10 @@
 			children = (
 				B33E94FB22E61EF400AA9939 /* AppDelegate.swift */,
 				B33E94FD22E61EF400AA9939 /* SceneDelegate.swift */,
-				B33E94FF22E61EF400AA9939 /* ViewController.swift */,
-				B33E950122E61EF400AA9939 /* Main.storyboard */,
 				B33E950422E61EF900AA9939 /* Assets.xcassets */,
 				B33E950622E61EF900AA9939 /* LaunchScreen.storyboard */,
 				B33E950922E61EF900AA9939 /* Info.plist */,
+				B3FC528F22E73C1C00C14386 /* DirectoryList.swift */,
 			);
 			path = "minues-ios-app";
 			sourceTree = "<group>";
@@ -142,7 +139,6 @@
 			files = (
 				B33E950822E61EF900AA9939 /* LaunchScreen.storyboard in Resources */,
 				B33E950522E61EF900AA9939 /* Assets.xcassets in Resources */,
-				B33E950322E61EF400AA9939 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,7 +149,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B33E950022E61EF400AA9939 /* ViewController.swift in Sources */,
+				B3FC529022E73C1C00C14386 /* DirectoryList.swift in Sources */,
 				B33E94FC22E61EF400AA9939 /* AppDelegate.swift in Sources */,
 				B33E94FE22E61EF400AA9939 /* SceneDelegate.swift in Sources */,
 			);
@@ -162,14 +158,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		B33E950122E61EF400AA9939 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				B33E950222E61EF400AA9939 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		B33E950622E61EF900AA9939 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

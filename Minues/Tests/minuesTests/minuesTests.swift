@@ -1,5 +1,5 @@
 import XCTest
-@testable import minues
+@testable import Minues
 
 final class minuesTests: XCTestCase {
     func testExample() {

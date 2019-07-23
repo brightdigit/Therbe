@@ -40,7 +40,7 @@ public struct FrontMatter {
   public let categories: [String]
   public let cover_image: URL
   
-  var yaml : String {
+  public var yaml : String {
       return """
 layout: \(self.layout)
 title:  "\(self.title)"
@@ -50,4 +50,15 @@ categories: \(self.categories)
 cover_image: \(self.cover_image)
 """
     }
+  
+  public var dictionary: [String : Any] {
+    return [
+      "title" : self.title,
+      "layout" : self.layout,
+      "date": self.date,
+      "tags": self.tags,
+      "categories": self.categories,
+      "cover_image": self.cover_image
+    ]
+  }
 }

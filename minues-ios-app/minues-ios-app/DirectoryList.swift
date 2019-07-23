@@ -35,6 +35,15 @@ struct DirectoryList: View {
     return formatter
   }()
    
+  var processingReady : Bool {
+    guard let result = result else {
+      return false
+    }
+    guard let items = try? result.get() else {
+      return false
+    }
+    return true
+  }
   @State var generator : Generator?
   var isGenerating: Any?  {
     generator.flatMap{ self.result == nil ? $0 : nil }
@@ -72,6 +81,12 @@ struct DirectoryList: View {
     return markdownDirectoryURL
   }
   
+  var errorText : Text? {
+    return self.lastError.map{
+     Text($0.localizedDescription)
+    }
+  }
+  
   var body: some View {
     NavigationView{
       ZStack{
@@ -80,12 +95,58 @@ struct DirectoryList: View {
         activityView
         
       }.alert(isPresented: $showError, content: {
-        Alert(title: Text("Error"))
+        
+        Alert(title: Text("Error"), message: self.errorText)
       })
         .navigationBarTitle(Text("\(self.siteName) Posts"))
         
-        .navigationBarItems(trailing: Button(action: self.generate){ Text("Generate")}.disabled(isGenerating != nil))
+        .navigationBarItems(trailing: HStack{
+          Button(action: self.generate){ Text("Generate")}.disabled(isGenerating != nil)
+          Button(action: self.process){ Text("Process")}.disabled(!processingReady)
+        })
       
+      
+    }
+  }
+  
+  func process () {
+    let minues = Minues()
+    
+    guard let result = self.result else {
+      return
+    }
+    
+    guard let items = try? result.get() else {
+      return
+    }
+    
+    
+    let destinationDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+    print(destinationDirectoryURL)
+    let group = DispatchGroup()
+    
+    for item in items {
+      group.enter()
+      DispatchQueue.global().async {
+
+        let html = Result(catching: {try minues.run(fromEntry: item)})
+        let url = destinationDirectoryURL.appendingPathComponent(item.frontMatter.title.slugify()).appendingPathExtension("html")
+        let result = html.flatMap{
+          (html) in
+          Result(catching: {
+            try html.write(to: url, atomically: false, encoding: .utf8)
+          })
+        }
+        do {
+          try result.get()
+        } catch let error {
+          self.lastError = error
+        }
+        group.leave()
+      }
+    }
+    
+    group.notify(queue: .main) {
       
     }
   }

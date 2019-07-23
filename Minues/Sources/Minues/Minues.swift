@@ -17,17 +17,11 @@ struct RegexResult {
 }
 
 
-struct minues {
-  func run () throws -> String {
-    let encodedYAML = """
-    ---
-    first: 1st
-    second: 2nd
-    ---
-    ## [Down](https://github.com/iwasrobbed/Down)
-    * {{first}}
-    * {{second}}
-    """
+public struct Minues {
+  public init () {
+    
+  }
+  public func run (fromString encodedYAML: String) throws -> String {
     let components = try componentsFromMarkdown(encodedYAML)
     if let dictionary = components.frontMatter as? [String : Any] {
       let template = Template(templateString: try components.markdown.toHTML())
@@ -36,6 +30,12 @@ struct minues {
       return try components.markdown.toHTML()
     }
     
+  }
+  
+  public func run (fromEntry entry: MarkdownEntry) throws -> String {
+    let down = Down(markdownString: entry.markdown)
+    let template = Template(templateString: try down.toHTML())
+    return try template.render(entry.frontMatter.dictionary)
   }
   
 //

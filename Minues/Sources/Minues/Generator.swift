@@ -142,6 +142,7 @@ public class Generator   {
   static fileprivate func write(_ entryResult: Result<MarkdownEntry, Error>)  throws -> MarkdownEntry {
     let entry : MarkdownEntry
     entry = try entryResult.get()
+    
     try entry.text.write(to: entry.url, atomically: false, encoding: .utf8)
     return entry
   }

@@ -9,8 +9,8 @@ import Foundation
 
 
 public struct MarkdownEntry {
-  let frontMatter: FrontMatter
-  let markdown: String
+  public let frontMatter: FrontMatter
+  public let markdown: String
   public let url : URL
   
   var text : String {

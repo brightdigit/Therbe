@@ -33,12 +33,12 @@ public struct FrontMatter {
               return formatter
     }
   }()
-  let layout: String = "post"
-  let title : String
-  let date: Date
-  let tags : [String]
-  let categories: [String]
-  let cover_image: URL
+  public let layout: String = "post"
+  public let title : String
+  public let date: Date
+  public let tags : [String]
+  public let categories: [String]
+  public let cover_image: URL
   
   var yaml : String {
       return """

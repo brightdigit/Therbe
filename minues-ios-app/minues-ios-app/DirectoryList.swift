@@ -28,7 +28,17 @@ struct ActivitiyIndicatorView : UIViewRepresentable {
 
 struct DirectoryList: View {
   let siteName : String
+  let dateFormatter = { () -> DateFormatter in
+    let formatter = DateFormatter()
+    formatter.dateStyle = .medium
+    formatter.timeStyle = .none
+    return formatter
+  }()
+   
   @State var generator : Generator?
+  var isGenerating: Any?  {
+    generator.flatMap{ self.result == nil ? $0 : nil }
+  }
   @State var lastError : Error? {
     didSet {
       self.showError = self.lastError != nil
@@ -73,16 +83,25 @@ struct DirectoryList: View {
         Alert(title: Text("Error"))
       })
         .navigationBarTitle(Text("\(self.siteName) Posts"))
-        .navigationBarItems(trailing: Button(action: self.generate){ Text("Generate")})
+        
+        .navigationBarItems(trailing: Button(action: self.generate){ Text("Generate")}.disabled(isGenerating != nil))
+      
+      
     }
   }
   
   var list: some View {
     let items = self.result.flatMap { try? $0.get() }    
     
-    return items.map { (urls) in
-      return List(urls, id: \.url.lastPathComponent)  { entry in
-        Text(entry.url.lastPathComponent)
+    return items.map { (entries) in
+      return List(entries.sorted(by: { (lhs, rhs) -> Bool in
+        return lhs.frontMatter.date > rhs.frontMatter.date
+      }), id: \.url.lastPathComponent)  { entry in
+        VStack(alignment: .leading) {
+          Text(entry.frontMatter.title)
+          Text(self.dateFormatter.string(from: entry.frontMatter.date)).font(.subheadline)
+        }
+        
       }
     }
   }
@@ -96,7 +115,7 @@ struct DirectoryList: View {
   }
   
   var activityView: some View {
-    let isGenerating = generator.flatMap{ self.result == nil ? $0 : nil }
+    
     return isGenerating.map { (_)  in
       ActivitiyIndicatorView(style: .large)
     }

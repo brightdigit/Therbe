@@ -32,10 +32,10 @@ class ResultListBuilder<Element> {
 public class Generator   {
   let destinationURL : URL
   let count : Int
-  let callback : (ResultList<URL>) -> ()
+  let callback : (ResultList<MarkdownEntry>) -> ()
   let group = DispatchGroup()
   var tasks : [URLSessionDownloadTask]!
-  let resultListBuilder = ResultListBuilder<URL>()
+  let resultListBuilder = ResultListBuilder<MarkdownEntry>()
   
   let photoURLTemplate = "https://picsum.photos/id/%d/%d/%d"
   let markdownUrl = URL(string: "https://jaspervdj.be/lorem-markdownum/markdown.txt")!
@@ -60,7 +60,7 @@ public class Generator   {
     return currentState ?? .suspended
   }
   
-  init (destinationURL: URL, count: Int, callback: @escaping (ResultList<URL>) -> ()) {
+  init (destinationURL: URL, count: Int, callback: @escaping (ResultList<MarkdownEntry>) -> ()) {
     self.destinationURL = destinationURL
     self.count = count
     self.callback = callback
@@ -71,7 +71,7 @@ public class Generator   {
     }
   }
   
-  public static func generate(_ count: Int, markdownFilesAt directoryURL: URL, _ completed: @escaping (ResultList<URL>) -> ()) -> Generator {
+  public static func generate(_ count: Int, markdownFilesAt directoryURL: URL, _ completed: @escaping (ResultList<MarkdownEntry>) -> ()) -> Generator {
     let generator = Generator(destinationURL: directoryURL, count: count, callback: completed)
     generator.begin()
     return generator
@@ -117,14 +117,20 @@ public class Generator   {
         guard let title = foundTitle else {
           throw MissingTitleError()
         }
-        let frontMatter = FrontMatter(title: title, tags: ["a", "b", "c"], categories: ["a", "b", "c"], cover_image: URL(string: String(format: photoURLTemplate, Int.random(in: 1...1000), 1920, 960))!)
-        return MarkdownEntry(frontMatter: frontMatter, markdown: newMarkdown)
+        let maximumDistanceFromNow =  2600000.0 // one month from now
+        let minimumDistanceFromNow = -47500000.0 // 1.5 years from now
+        let timeInterval = TimeInterval.random(in: (minimumDistanceFromNow...maximumDistanceFromNow))
+        let date = Date(timeIntervalSinceNow: timeInterval)
+        let fileName = title.slugify() + ".md"
+        let fileURL = self.destinationURL.appendingPathComponent(fileName)
+        let frontMatter = FrontMatter(title: title, date: date, tags: ["a", "b", "c"], categories: ["a", "b", "c"], cover_image: URL(string: String(format: photoURLTemplate, Int.random(in: 1...1000), 1920, 960))!)
+        return MarkdownEntry(frontMatter: frontMatter, markdown: newMarkdown, url: fileURL)
       }
       
     }
     do {
-      let url = try Generator.write(entryResult, toDirectory: destinationURL)
-      self.resultListBuilder.append(url)
+      let entry = try Generator.write(entryResult)
+      self.resultListBuilder.append(entry)
     }
     catch let error {
       self.resultListBuilder.append(error)
@@ -133,15 +139,11 @@ public class Generator   {
   }
 
   
-  static fileprivate func write(_ entryResult: Result<MarkdownEntry, Error>, toDirectory directoryURL : URL)  throws -> URL {
+  static fileprivate func write(_ entryResult: Result<MarkdownEntry, Error>)  throws -> MarkdownEntry {
     let entry : MarkdownEntry
     entry = try entryResult.get()
-    let fileName = entry.frontMatter.title.slugify() + ".md"
-    let destinationURL = directoryURL.appendingPathComponent(fileName)
-    
-    try entry.text.write(to: destinationURL, atomically: false, encoding: .utf8)
-    return destinationURL
-    
+    try entry.text.write(to: entry.url, atomically: false, encoding: .utf8)
+    return entry
   }
 }
 

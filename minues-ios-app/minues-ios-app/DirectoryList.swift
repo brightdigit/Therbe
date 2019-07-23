@@ -34,7 +34,7 @@ struct DirectoryList: View {
       self.showError = self.lastError != nil
     }
   }
-  @State var result : ResultList<URL>? {
+  @State var result : ResultList<MarkdownEntry>? {
     didSet {
       if case let .failure(error) = result {
         self.lastError = error
@@ -78,12 +78,11 @@ struct DirectoryList: View {
   }
   
   var list: some View {
-    let items = self.result.flatMap { try? $0.get() }
-    
+    let items = self.result.flatMap { try? $0.get() }    
     
     return items.map { (urls) in
-      return List(urls.identified(by: \.lastPathComponent)) { url in
-        Text(url.lastPathComponent)
+      return List(urls, id: \.url.lastPathComponent)  { entry in
+        Text(entry.url.lastPathComponent)
       }
     }
   }

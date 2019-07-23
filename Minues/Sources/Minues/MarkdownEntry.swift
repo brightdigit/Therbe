@@ -8,9 +8,10 @@
 import Foundation
 
 
-struct MarkdownEntry {
+public struct MarkdownEntry {
   let frontMatter: FrontMatter
   let markdown: String
+  public let url : URL
   
   var text : String {
     return """

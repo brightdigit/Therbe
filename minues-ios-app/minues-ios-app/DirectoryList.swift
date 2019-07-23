@@ -23,24 +23,35 @@ struct ActivitiyIndicatorView : UIViewRepresentable {
   
   typealias UIViewType = UIActivityIndicatorView
   
-  //@Binding var isAnimating: Bool
   let style: UIActivityIndicatorView.Style
-  //
-  //  func makeUIView(context: UIViewRepresentableContext<ActivityIndicatorView>) -> UIActivityIndicatorView {
-  //    return UIActivityIndicatorView(style: style)
-  //  }
-  //
-  //  func updateUIView(_ uiView: UIActivityIndicatorView, context: UIViewRepresentableContext<ActivityIndicatorView>) {
-  //    isAnimating ? uiView.startAnimating() : uiView.stopAnimating()
-  //  }
 }
 
 struct DirectoryList: View {
   let siteName : String
   @State var generator : Generator?
-  @State var lastError : Error?
-  @State var result : ResultList<URL>?
-  @State var showError : Bool = true
+  @State var lastError : Error? {
+    didSet {
+      self.showError = self.lastError != nil
+    }
+  }
+  @State var result : ResultList<URL>? {
+    didSet {
+      if case let .failure(error) = result {
+        self.lastError = error
+      }
+    }
+  }
+  @State var showError : Bool = false {
+    didSet {
+      guard !showError else {
+        return
+      }
+      guard self.lastError != nil else {
+        return
+      }
+      self.lastError = nil
+    }
+  }
   func getDirectoryURL() throws -> URL {
     let documentDirectoryUrls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
     guard let documentDirURL = documentDirectoryUrls.first else {
@@ -54,13 +65,9 @@ struct DirectoryList: View {
   var body: some View {
     NavigationView{
       ZStack{
-        List{
-          Text("First")
-          Text("Second")
-          Text("Third")
-        }
-        Text("No Items")
-        ActivitiyIndicatorView(style: .large)
+        list
+        emptyText
+        activityView
         
       }.alert(isPresented: $showError, content: {
         Alert(title: Text("Error"))
@@ -68,6 +75,33 @@ struct DirectoryList: View {
         .navigationBarTitle(Text("\(self.siteName) Posts"))
         .navigationBarItems(trailing: Button(action: self.generate){ Text("Generate")})
     }
+  }
+  
+  var list: some View {
+    let items = self.result.flatMap { try? $0.get() }
+    
+    
+    return items.map { (urls) in
+      return List(urls.identified(by: \.lastPathComponent)) { url in
+        Text(url.lastPathComponent)
+      }
+    }
+  }
+  
+  var emptyText : some View {
+    let items = self.result.flatMap { try? $0.get() }.flatMap{ $0.count == 0 ? $0 : nil }
+   
+    return items.map { _ in
+      Text("No Items")
+    }
+  }
+  
+  var activityView: some View {
+    let isGenerating = generator.flatMap{ self.result == nil ? $0 : nil }
+    return isGenerating.map { (_)  in
+      ActivitiyIndicatorView(style: .large)
+    }
+    
   }
   
   func generate () {
@@ -79,7 +113,7 @@ struct DirectoryList: View {
       return
     }
     let generator = Generator.generate(20, markdownFilesAt: markdownDirectoryURL) { (result) in
-      print(result)
+      self.result = result
     }
     self.generator = generator
   }

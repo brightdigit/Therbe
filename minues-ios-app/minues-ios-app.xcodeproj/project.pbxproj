@@ -12,6 +12,7 @@
 		B33E94FE22E61EF400AA9939 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33E94FD22E61EF400AA9939 /* SceneDelegate.swift */; };
 		B33E950522E61EF900AA9939 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B33E950422E61EF900AA9939 /* Assets.xcassets */; };
 		B33E950822E61EF900AA9939 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B33E950622E61EF900AA9939 /* LaunchScreen.storyboard */; };
+		B342267E22E7DA6C002E76FE /* SiteDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = B342267D22E7DA6C002E76FE /* SiteDetails.swift */; };
 		B38F0D0E22E79F61008E3D0A /* head.html in Resources */ = {isa = PBXBuildFile; fileRef = B38F0CF722E79F61008E3D0A /* head.html */; };
 		B38F0D0F22E79F61008E3D0A /* footer.html in Resources */ = {isa = PBXBuildFile; fileRef = B38F0CF822E79F61008E3D0A /* footer.html */; };
 		B38F0D1022E79F61008E3D0A /* header.html in Resources */ = {isa = PBXBuildFile; fileRef = B38F0CF922E79F61008E3D0A /* header.html */; };
@@ -43,6 +44,7 @@
 		B33E950422E61EF900AA9939 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B33E950722E61EF900AA9939 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B33E950922E61EF900AA9939 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B342267D22E7DA6C002E76FE /* SiteDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteDetails.swift; sourceTree = "<group>"; };
 		B38F0CF722E79F61008E3D0A /* head.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = head.html; sourceTree = "<group>"; };
 		B38F0CF822E79F61008E3D0A /* footer.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = footer.html; sourceTree = "<group>"; };
 		B38F0CF922E79F61008E3D0A /* header.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = header.html; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 				B33E950922E61EF900AA9939 /* Info.plist */,
 				B3FC528F22E73C1C00C14386 /* DirectoryList.swift */,
 				B38F0D2122E79F9A008E3D0A /* SiteList.swift */,
+				B342267D22E7DA6C002E76FE /* SiteDetails.swift */,
 			);
 			path = "minues-ios-app";
 			sourceTree = "<group>";
@@ -276,6 +279,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B342267E22E7DA6C002E76FE /* SiteDetails.swift in Sources */,
 				B3FC529022E73C1C00C14386 /* DirectoryList.swift in Sources */,
 				B33E94FC22E61EF400AA9939 /* AppDelegate.swift in Sources */,
 				B38F0D2222E79F9A008E3D0A /* SiteList.swift in Sources */,

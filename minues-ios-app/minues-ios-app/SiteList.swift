@@ -70,6 +70,8 @@ struct SiteList: View {
   var body: some View {
     NavigationView{
       List(self.sites, id: \.id) { (site) in
+
+        NavigationLink(destination: SiteDetails(site: site)) {
         HStack{
           URLImage(url: site.logoUrl, placeholder: Image(systemName: "photo")).frame(minWidth: 32, maxWidth: 64, minHeight: 32, maxHeight: 64).clipped().aspectRatio(contentMode: .fit)
           VStack(alignment: .leading) {
@@ -77,7 +79,8 @@ struct SiteList: View {
             Text(site.domainName).font(.subheadline)
           }
         }
-      }
+        }
+      }.navigationBarTitle("Sites")
     }
   }
 }

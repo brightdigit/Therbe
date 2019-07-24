@@ -30,13 +30,25 @@ protocol Entry {
   var id : UUID { get }
 }
 
+struct BasicEntry : Entry {
+  let type: EntryType
+  
+  let url: URL
+  
+  let id: UUID = UUID()
+  
+  var name : String {
+    return url.lastPathComponent
+  }
+}
+
 class SitePreparation {
   
 }
 
 struct SiteDetails: View {
   let site : Site
-  @State var result : ResultList<Entry>?
+  @State var result : Result<[Entry], Error>?
   var isActive : Bool {
     let items = result.flatMap{ try? $0.get()}
     return items == nil
@@ -60,7 +72,43 @@ struct SiteDetails: View {
   }
   
   func beginLoading () {
+    guard let themeDirectoryUrl = Bundle.main.url(forResource: "arctic-fox-theme", withExtension: nil) else {
+      return
+    }
+    let siteDirectoryUrl = self.site.documentsURL
+    var isDirectory : ObjCBool = false
+    let isExists = FileManager.default.fileExists(atPath: siteDirectoryUrl.path, isDirectory: &isDirectory)
+    if isExists && !isDirectory.boolValue {
+      try? FileManager.default.removeItem(at: siteDirectoryUrl)
+    }
     
+    try? FileManager.default.createDirectory(at: Directories.shared.sitesDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
+    try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
+    
+    let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
+      (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
+    }
+    let items = urls?.compactMap({ (url) -> Entry? in
+      let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
+      if isDirectory {
+        let pages = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .init()).contains {
+          ["html", "md", "markdown"].contains($0.pathExtension)
+        }
+        if pages == true {
+          return BasicEntry(type: .folder, url: url)
+        }
+      } else {
+        return BasicEntry(type: .page, url: url)
+      }
+      return nil
+    })
+    
+    self.result = Result {
+      guard let items = items else {
+        throw NoDocumentDirectoryError()
+      }
+      return items
+    }
   }
 
   var activityView: some View {
@@ -79,7 +127,11 @@ struct SiteDetails: View {
       try? $0.get()
     }.map { (entries) in
       List(entries, id: \.id) { (entry) in
-        Text(entry.name)
+        HStack{
+          Image(systemName: entry.type.systemName)
+            Text(entry.name)
+        }
+        
       }
     }
 //      List($0, id: \.id) {

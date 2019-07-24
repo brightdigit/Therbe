@@ -48,7 +48,6 @@ struct Site {
   let logoUrl : URL
   let id : UUID
   let domainName : String
-  
   #if DEBUG
   
   

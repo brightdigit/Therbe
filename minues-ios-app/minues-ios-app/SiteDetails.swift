@@ -7,6 +7,9 @@
 //
 
 import SwiftUI
+import Minues
+
+
 
 struct SiteDetails: View {
   let site : Site

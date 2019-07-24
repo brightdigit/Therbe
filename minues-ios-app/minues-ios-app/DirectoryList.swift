@@ -11,19 +11,28 @@ import SwiftUI
 
 struct NoDocumentDirectoryError : Error {}
 
-struct ActivitiyIndicatorView : UIViewRepresentable {
-  func makeUIView(context: UIViewRepresentableContext<ActivitiyIndicatorView>) -> UIActivityIndicatorView {
-    return UIActivityIndicatorView(style: self.style)
+struct Directories {
+  static let shared = try! Directories()
+  let documentDirectoryUrl : URL
+  let sitesDirectoryUrl : URL
+  init (fromUrlFor searchPath: FileManager.SearchPathDirectory? = .documentDirectory, in domainMask: FileManager.SearchPathDomainMask = .userDomainMask) throws {
+    let documentDirectoryUrls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+          guard let documentDirURL = documentDirectoryUrls.first else {
+            throw NoDocumentDirectoryError()
+          }
+    self.documentDirectoryUrl = documentDirURL
+    self.sitesDirectoryUrl = self.documentDirectoryUrl.appendingPathComponent("sites", isDirectory: true)
   }
-  
-  func updateUIView(_ uiView: UIActivityIndicatorView, context: UIViewRepresentableContext<ActivitiyIndicatorView>) {
-    uiView.startAnimating()
-  }
-  
-  
-  typealias UIViewType = UIActivityIndicatorView
-  
-  let style: UIActivityIndicatorView.Style
+//  func getDirectoryURL() throws -> URL {
+//    
+//      let documentDirectoryUrls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+//      guard let documentDirURL = documentDirectoryUrls.first else {
+//        throw NoDocumentDirectoryError()
+//      }
+//      let markdownDirectoryURL = documentDirURL.appendingPathComponent("sites", isDirectory: true).appendingPathComponent(self.siteName, isDirectory: true).appendingPathComponent("posts", isDirectory: true)
+//      try  FileManager.default.createDirectory(at: markdownDirectoryURL, withIntermediateDirectories: true, attributes: nil)
+//      return markdownDirectoryURL
+//    }
 }
 
 struct DirectoryList: View {
@@ -71,15 +80,7 @@ struct DirectoryList: View {
       self.lastError = nil
     }
   }
-  func getDirectoryURL() throws -> URL {
-    let documentDirectoryUrls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-    guard let documentDirURL = documentDirectoryUrls.first else {
-      throw NoDocumentDirectoryError()
-    }
-    let markdownDirectoryURL = documentDirURL.appendingPathComponent("sites", isDirectory: true).appendingPathComponent(self.siteName, isDirectory: true).appendingPathComponent("posts", isDirectory: true)
-    try  FileManager.default.createDirectory(at: markdownDirectoryURL, withIntermediateDirectories: true, attributes: nil)
-    return markdownDirectoryURL
-  }
+  
   
   var errorText : Text? {
     return self.lastError.map{
@@ -184,12 +185,8 @@ struct DirectoryList: View {
   
   func generate () {
     let markdownDirectoryURL: URL
-    do {
-      markdownDirectoryURL = try self.getDirectoryURL()
-    } catch let error {
-      self.lastError = error
-      return
-    }
+    markdownDirectoryURL = Directories.shared.sitesDirectoryUrl.appendingPathComponent(self.siteName, isDirectory: true).appendingPathComponent("posts", isDirectory: true)
+    
     let generator = Generator.generate(20, markdownFilesAt: markdownDirectoryURL) { (result) in
       self.result = result
     }

@@ -45,6 +45,7 @@
 		B33E950722E61EF900AA9939 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B33E950922E61EF900AA9939 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B342267D22E7DA6C002E76FE /* SiteDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteDetails.swift; sourceTree = "<group>"; };
+		B342267F22E7DF07002E76FE /* minues-ios-app.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "minues-ios-app.entitlements"; sourceTree = "<group>"; };
 		B38F0CF722E79F61008E3D0A /* head.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = head.html; sourceTree = "<group>"; };
 		B38F0CF822E79F61008E3D0A /* footer.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = footer.html; sourceTree = "<group>"; };
 		B38F0CF922E79F61008E3D0A /* header.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = header.html; sourceTree = "<group>"; };
@@ -108,6 +109,7 @@
 		B33E94FA22E61EF400AA9939 /* minues-ios-app */ = {
 			isa = PBXGroup;
 			children = (
+				B342267F22E7DF07002E76FE /* minues-ios-app.entitlements */,
 				B38F0CF522E79F61008E3D0A /* arctic-fox-theme */,
 				B33E94FB22E61EF400AA9939 /* AppDelegate.swift */,
 				B33E94FD22E61EF400AA9939 /* SceneDelegate.swift */,
@@ -419,7 +421,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "minues-ios-app/minues-ios-app.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_TEAM = MLT7M394S7;
 				INFOPLIST_FILE = "minues-ios-app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -428,6 +432,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.brightdigit.minues-ios-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -437,7 +442,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "minues-ios-app/minues-ios-app.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_TEAM = MLT7M394S7;
 				INFOPLIST_FILE = "minues-ios-app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -446,6 +453,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.brightdigit.minues-ios-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

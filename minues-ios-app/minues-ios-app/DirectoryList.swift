@@ -88,7 +88,6 @@ struct DirectoryList: View {
   }
   
   var body: some View {
-    NavigationView{
       ZStack{
         list
         emptyText
@@ -106,7 +105,7 @@ struct DirectoryList: View {
         })
       
       
-    }
+    
   }
   
   func process () {

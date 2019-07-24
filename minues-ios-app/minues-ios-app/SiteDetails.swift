@@ -11,7 +11,6 @@ import SwiftUI
 struct SiteDetails: View {
   let site : Site
   var body: some View {
-    NavigationView{
       List{
         NavigationLink(destination: DirectoryList(siteName: site.title)) {
           HStack{
@@ -20,7 +19,7 @@ struct SiteDetails: View {
           }
         }
       }
-    }
+    
   }
 }
 

@@ -48,7 +48,7 @@ struct DirectoryList: View {
     guard let result = result else {
       return false
     }
-    guard let items = try? result.get() else {
+    guard (try? result.get()) != nil else {
       return false
     }
     return true

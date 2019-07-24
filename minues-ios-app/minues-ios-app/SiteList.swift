@@ -48,6 +48,10 @@ struct Site {
   let logoUrl : URL
   let id : UUID
   let domainName : String
+  
+  var documentsURL : URL {
+    return Directories.shared.sitesDirectoryUrl.appendingPathComponent(id.uuidString)
+  }
   #if DEBUG
   
   

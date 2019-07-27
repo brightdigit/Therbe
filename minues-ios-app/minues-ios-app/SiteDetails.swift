@@ -84,31 +84,35 @@ struct SiteDetails: View {
     
     try? FileManager.default.createDirectory(at: Directories.shared.sitesDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
     try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
-    
-    let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
-      (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
+    print(siteDirectoryUrl)
+    let postsUrl = siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true)
+    _ = Generator.generate(20, markdownFilesAt: postsUrl) { (_) in
+       let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
+           (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
+         }
+         let items = urls?.compactMap({ (url) -> Entry? in
+           let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
+           if isDirectory {
+             let pages = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .init()).contains {
+               ["html", "md", "markdown"].contains($0.pathExtension)
+             }
+             if pages == true {
+               return BasicEntry(type: .folder, url: url)
+             }
+           } else {
+             return BasicEntry(type: .page, url: url)
+           }
+           return nil
+         })
+         
+         self.result = Result {
+           guard let items = items else {
+             throw NoDocumentDirectoryError()
+           }
+           return items
+         }
     }
-    let items = urls?.compactMap({ (url) -> Entry? in
-      let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
-      if isDirectory {
-        let pages = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .init()).contains {
-          ["html", "md", "markdown"].contains($0.pathExtension)
-        }
-        if pages == true {
-          return BasicEntry(type: .folder, url: url)
-        }
-      } else {
-        return BasicEntry(type: .page, url: url)
-      }
-      return nil
-    })
-    
-    self.result = Result {
-      guard let items = items else {
-        throw NoDocumentDirectoryError()
-      }
-      return items
-    }
+   
   }
 
   var activityView: some View {
@@ -134,14 +138,6 @@ struct SiteDetails: View {
         
       }
     }
-//      List($0, id: \.id) {
-//                NavigationLink(destination: DirectoryList(siteName: site.title)) {
-//                  HStack{
-//                    Image(systemName: $0.type.systemName)
-//                    Text($0.name)
-//                  }
-//                }
-//      }
     
   }
 }

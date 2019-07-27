@@ -1,0 +1,6 @@
+{
+  "set" : "minues-ios-app/minues-ios-app/Assets.xcassets/AppIcon.appiconset",
+  "source" : "Minues.svg",
+  "background" : "#FFFFFFFF",
+  "remove-alpha" : true
+}

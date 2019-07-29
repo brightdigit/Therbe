@@ -16,6 +16,18 @@ struct RegexResult {
   }
 }
 
+public struct BuilderProgress {
+  
+}
+
+public struct Builder {
+
+  public func build (fromSourceDirectory: URL, toDestinationDirectory: URL, _ progress: (BuilderProgress) -> Void, completed: (Error?) -> Void) {
+    
+  }
+  
+  
+}
 
 public struct Minues {
   public init () {
@@ -38,20 +50,6 @@ public struct Minues {
     return try template.render(entry.frontMatter.dictionary)
   }
   
-//
-//  fileprivate func transformFrontMatter(_ markdown: String) -> String {
-//    let result = markdown =~ "^-{3}\n[\\s\\S]*?\n-{3}\n"
-//    if let match = result.first {
-//      let frontMatter = markdown[match]
-//      let codeBlockString = frontMatter.replacingOccurrences(of: "---", with: "~~~")
-//      let hiddenMarkup = "<hr id='markoff-frontmatter-rule'>\n\n"
-//      return markdown.replacingOccurrences(of: frontMatter, with: hiddenMarkup + codeBlockString)
-//    } else {
-//      return markdown
-//    }
-//  }
-//
-
   
   fileprivate func componentsFromMarkdown(_ markdown: String) throws -> (frontMatter : Any?, markdown: Down) {
     let result = markdown =~ "^-{3}\n([\\s\\S]*?)\n-{3}\n"

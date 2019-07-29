@@ -49,7 +49,7 @@ class SitePreparation {
 struct SiteDetails: View {
   let site : Site
   @State var result : Result<[Entry], Error>?
-   @State var isPresented = false
+  @State var isPresented = false
   var isActive : Bool {
     let items = result.flatMap{ try? $0.get()}
     return items == nil
@@ -62,19 +62,20 @@ struct SiteDetails: View {
     .navigationBarTitle(Text(site.title))
       .navigationBarItems(trailing:
         Button("Build") {
-                        self.isPresented = true
-                    })
+          self.isPresented = true
+      })
       
-    .onAppear(perform: self.beginLoading)
-      .sheet(isPresented: $isPresented, content: { BuildView() })
-//      List{
-//        NavigationLink(destination: DirectoryList(siteName: site.title)) {
-//          HStack{
-//            Image(systemName: "folder")
-//            Text("Pages")
-//          }
-//        }
-//      }
+      .onAppear(perform: self.beginLoading)
+      .sheet(isPresented: $isPresented, content: {
+        NavigationView{
+          BuildView(site: self.site)
+            .navigationBarItems(trailing:
+              Button("Cancel") {
+                self.isPresented = false
+              }
+          )
+        }
+      })
     
   }
   
@@ -95,42 +96,42 @@ struct SiteDetails: View {
     print(siteDirectoryUrl)
     let postsUrl = siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true)
     _ = Generator.generate(20, markdownFilesAt: postsUrl) { (_) in
-       let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
-           (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
-         }
-         let items = urls?.compactMap({ (url) -> Entry? in
-           let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
-           if isDirectory {
-             let pages = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .init()).contains {
-               ["html", "md", "markdown"].contains($0.pathExtension)
-             }
-             if pages == true {
-               return BasicEntry(type: .folder, url: url)
-             }
-           } else {
-             return BasicEntry(type: .page, url: url)
-           }
-           return nil
-         })
-         
-         self.result = Result {
-           guard let items = items else {
-             throw NoDocumentDirectoryError()
-           }
-           return items
-         }
+      let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
+        (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
+      }
+      let items = urls?.compactMap({ (url) -> Entry? in
+        let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
+        if isDirectory {
+          let pages = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .init()).contains {
+            ["html", "md", "markdown"].contains($0.pathExtension)
+          }
+          if pages == true {
+            return BasicEntry(type: .folder, url: url)
+          }
+        } else {
+          return BasicEntry(type: .page, url: url)
+        }
+        return nil
+      })
+      
+      self.result = Result {
+        guard let items = items else {
+          throw NoDocumentDirectoryError()
+        }
+        return items
+      }
     }
-   
+    
   }
-
+  
   var activityView: some View {
     let view : ActivitiyIndicatorView?
-      
-      if isActive {
-        view = ActivitiyIndicatorView(style: .large)
-      } else {
-        view = nil
-      }
+    
+    if isActive {
+      view = ActivitiyIndicatorView(style: .large)
+    } else {
+      view = nil
+    }
     return view
   }
   
@@ -141,7 +142,7 @@ struct SiteDetails: View {
       List(entries, id: \.id) { (entry) in
         HStack{
           Image(systemName: entry.type.systemName)
-            Text(entry.name)
+          Text(entry.name)
         }
         
       }

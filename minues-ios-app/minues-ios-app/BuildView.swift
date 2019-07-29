@@ -9,15 +9,17 @@
 import SwiftUI
 
 struct BuildView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello World!"/*@END_MENU_TOKEN@*/)
-    }
+  let site : Site
+  
+  var body: some View {
+    Text("Building...")
+  }
 }
 
 #if DEBUG
 struct BuildView_Previews: PreviewProvider {
-    static var previews: some View {
-        BuildView()
-    }
+  static var previews: some View {
+    BuildView(site: Site(title: "Lorem Ipsum"))
+  }
 }
 #endif

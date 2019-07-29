@@ -2,17 +2,6 @@
 layout: page
 ---
 
-<!DOCTYPE html>
-<html>
-
-  {% include head.html %}
-
-  <body>
-
-    {% include header.html %}
-
-    <div class="page-content">
-      <div class="wrapper">
         <div class="home">
 
           <h1 class="page-heading">{{ site.title }}</h1>
@@ -20,17 +9,8 @@ layout: page
           <ul class="post-list">
             {% for post in site.posts %}
               <li>
-                <!-- <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span> -->
-                <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+                <a class="post-link" href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
               </li>
             {% endfor %}
           </ul>
         </div>
-      </div>
-    </div>
-
-    {% include footer.html %}
-
-  </body>
-</html>
-

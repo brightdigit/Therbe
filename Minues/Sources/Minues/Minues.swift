@@ -65,11 +65,13 @@ struct SiteConfiguration : SiteConfigurationProtocol {
 protocol LayoutProtocol {
   var relativePath : String { get }
   var name : String { get }
+  func contents() throws -> String
 }
 
 protocol IncludeProtocol {
   var relativePath : String { get }
   var name : String { get }
+  func contents() throws -> String
 }
 
 struct Include : IncludeProtocol {
@@ -85,9 +87,11 @@ struct Include : IncludeProtocol {
   }
   
   var name: String {
-    return url.lastPathComponent
+    return url.deletingPathExtension().lastPathComponent
   }
-  
+  func contents() throws -> String {
+    return try String(contentsOf: self.url)
+  }
   
 }
 
@@ -104,7 +108,10 @@ struct Layout : LayoutProtocol {
   }
   
   var name: String {
-    return url.lastPathComponent
+    return url.deletingPathExtension().lastPathComponent
+  }
+  func contents() throws -> String {
+    return try String(contentsOf: self.url)
   }
 }
 protocol SiteFileBuilderProtocol {
@@ -162,8 +169,10 @@ extension Dictionary {
   }
 }
 protocol ContentProtocol {
-
+  
   var relativePath : String { get }
+  
+  func contents() throws -> String
 }
 struct Content : ContentProtocol {
   let baseUrl : URL
@@ -177,6 +186,9 @@ struct Content : ContentProtocol {
     return url.pathComponents[index...].joined(separator: "/")
   }
   
+  func contents() throws -> String {
+    return try String(contentsOf: self.url)
+  }
 }
 protocol SiteDetailsProtocol {
   var content : [ContentProtocol] { get }
@@ -260,14 +272,17 @@ public struct Builder {
     
     let environment = Environment(loader: FileSystemLoader(paths: [Path(site.baseUrl.path)]), extensions: nil)
     
-    let includes : [String : String]
-    let layouts  : [String : String]
+    var context = ["site" : site.configuration.context]
+    
+    let includes : [String : Any]
+    let layouts  : [String : Any]
+    
     let content : [String : String]
-    includes = [String : [IncludeProtocol]](grouping: site.includes, by: {
-      $0.name
-    }).compactMapValues{
-      $0.compactMap{ try? environment.renderTemplate(name: $0.relativePath, context: site.configuration.context) }.first
-    }
+        includes = [String : [IncludeProtocol]](grouping: site.includes, by: {
+          $0.name
+        }).compactMapValues{
+          $0.compactMap{ try? $0.contents() }.first
+        }
     
     
     
@@ -275,7 +290,7 @@ public struct Builder {
       layouts = [ String: [LayoutProtocol]](grouping: site.layouts, by: {
         $0.name
       }).compactMapValues{
-        $0.compactMap{ try? environment.renderTemplate(name: $0.relativePath, context: site.configuration.context) }.first
+        $0.compactMap{ try? $0.contents() }.first
       }
       
     }
@@ -284,74 +299,102 @@ public struct Builder {
       return completed(error)
     }
     
-    do {
+    let minues = Minues()
+    
       content = [ String: [ContentProtocol]](grouping: site.content, by: {
-              $0.relativePath
-            }).compactMapValues{
-              $0.compactMap{ try? environment.renderTemplate(name: $0.relativePath, context: site.configuration.context) }.first
-            }
-    } catch let error {
-      return completed(error)
+        $0.relativePath
+      }).compactMapValues{
+        $0.compactMap { (file) -> String? in
+          guard let text = try? file.contents() else {
+            return nil
+          }
+          guard let components = try? minues.componentsFromMarkdown(text) else {
+            return nil
+          }
+          let (pageAny, str) = components
+          let down = Down(markdownString: str)
+          guard let page = pageAny as? [String : Any] else {
+            return nil
+          }
+          guard let html = try? down.toHTML() else {
+            return nil
+          }
+          guard let layoutName = page["layout"] as? String else {
+            return nil
+          }
+          let context : [String : Any] = ["site" : site.configuration.context, "page" : page, "content" : html, "includes" : includes]
+          
+          guard let layout = layouts[layoutName] as? String else {
+            return nil
+          }
+          do {
+          let first = try environment.renderTemplate(string: layout, context: context)
+            return try environment.renderTemplate(string: first, context: context)
+          } catch let error {
+            debugPrint(error)
+            return nil
+          }
+        }.first
+      }
+      
+      for (pathComponent, text) in content {
+        let fileUrl = destinationURL.appendingPathComponent(pathComponent).deletingPathExtension().appendingPathExtension("html")
+        let directoryUrl = fileUrl.deletingLastPathComponent()
+        
+        do {
+          try FileManager.default.createDirectory(at: directoryUrl, withIntermediateDirectories: true, attributes: nil)
+          try text.write(to: fileUrl, atomically: false, encoding: .utf8)
+        } catch let error {
+          return completed(error)
+        }
+      }
+      
+      print(destinationURL)
+      completed(nil)
     }
     
-    for (pathComponent, text) in content {
-      let fileUrl = destinationURL.appendingPathComponent(pathComponent)
-      let directoryUrl = fileUrl.deletingLastPathComponent()
-
-      do {
-        try FileManager.default.createDirectory(at: directoryUrl, withIntermediateDirectories: true, attributes: nil)
-        try text.write(to: fileUrl, atomically: false, encoding: .utf8)
-      } catch let error {
-        return completed(error)
+    
+  }
+  
+  public struct Minues {
+    public init () {
+      
+    }
+    public func run (fromString encodedYAML: String) throws -> String {
+      //    let components = try componentsFromMarkdown(encodedYAML)
+      //    if let dictionary = components.frontMatter as? [String : Any] {
+      //      let template = Template(templateString: try components.markdown.toHTML())
+      //      return try template.render(dictionary)
+      //    } else {
+      //      return try components.markdown.toHTML()
+      //    }
+      throw NotImplementedError()
+    }
+    
+    public func run (fromEntry entry: Entry) throws -> String {
+      //let down = Down(markdownString: entry.markdown)
+      //let template = Template(templateString: try down.toHTML())
+      //return try template.render(entry.frontMatter.dictionary)
+      throw NotImplementedError()
+    }
+    
+    
+    fileprivate func componentsFromMarkdown(_ text: String) throws -> (frontMatter : Any?, content: String) {
+      let result = text =~ "^-{3}\n([\\s\\S]*?)\n-{3}\n"
+      let ranges = result.first
+      let totalRange = ranges?.first
+      let fmRange = ranges?.last
+      if let totalRange = totalRange, let fmRange = fmRange, ranges?.count == 2 {
+        let frontMatter = text[fmRange]
+        let yaml = try Yams.load(yaml: String(frontMatter))
+        let content = text[totalRange.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)
+        //let down = Down(markdownString: String(content))
+        
+        return (frontMatter: yaml, content: content)
+        
+      } else {
+        return (frontMatter: nil, content: text)
+        
       }
     }
-    
-    print(destinationURL)
-    completed(nil)
-  }
-  
-  
-}
-
-public struct Minues {
-  public init () {
-    
-  }
-  public func run (fromString encodedYAML: String) throws -> String {
-    //    let components = try componentsFromMarkdown(encodedYAML)
-    //    if let dictionary = components.frontMatter as? [String : Any] {
-    //      let template = Template(templateString: try components.markdown.toHTML())
-    //      return try template.render(dictionary)
-    //    } else {
-    //      return try components.markdown.toHTML()
-    //    }
-    throw NotImplementedError()
-  }
-  
-  public func run (fromEntry entry: Entry) throws -> String {
-    //let down = Down(markdownString: entry.markdown)
-    //let template = Template(templateString: try down.toHTML())
-    //return try template.render(entry.frontMatter.dictionary)
-    throw NotImplementedError()
-  }
-  
-  
-  fileprivate func componentsFromMarkdown(_ text: String) throws -> (frontMatter : Any?, content: String) {
-    let result = text =~ "^-{3}\n([\\s\\S]*?)\n-{3}\n"
-    let ranges = result.first
-    let totalRange = ranges?.first
-    let fmRange = ranges?.last
-    if let totalRange = totalRange, let fmRange = fmRange, ranges?.count == 2 {
-      let frontMatter = text[fmRange]
-      let yaml = try Yams.load(yaml: String(frontMatter))
-      let content = text[totalRange.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)
-      //let down = Down(markdownString: String(content))
-      
-      return (frontMatter: yaml, content: content)
-      
-    } else {
-      return (frontMatter: nil, content: text)
-      
-    }
-  }
 }

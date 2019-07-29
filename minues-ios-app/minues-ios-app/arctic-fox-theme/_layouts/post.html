@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 
-  {% include head.html %}
+  {{ includes.head }}
 
   <body>
 
-    {% include header.html %}
+    {{ includes.header }}
 
     <div class="page-content">
       <div class="wrapper">
@@ -13,7 +13,7 @@
 
           <header class="post-header">
              <h1 class="post-title">{{ page.title }}</h1>
-             <p class="post-meta">Posted on {{ page.date | date: "%b %-d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}</p>
+             <p class="post-meta">Posted on {{ page.date }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}</p>
           </header>
 
           <article class="post-content">
@@ -29,8 +29,7 @@
         </div>
       </div>
     </div>
-
-    {% include footer.html %}
+    {{ includes.footer }}
 
   </body>
 </html>

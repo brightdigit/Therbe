@@ -49,6 +49,7 @@ class SitePreparation {
 struct SiteDetails: View {
   let site : Site
   @State var result : Result<[Entry], Error>?
+   @State var isPresented = false
   var isActive : Bool {
     let items = result.flatMap{ try? $0.get()}
     return items == nil
@@ -59,7 +60,13 @@ struct SiteDetails: View {
       activityView
     }
     .navigationBarTitle(Text(site.title))
+      .navigationBarItems(trailing:
+        Button("Build") {
+                        self.isPresented = true
+                    })
+      
     .onAppear(perform: self.beginLoading)
+      .sheet(isPresented: $isPresented, content: { BuildView() })
 //      List{
 //        NavigationLink(destination: DirectoryList(siteName: site.title)) {
 //          HStack{
@@ -70,6 +77,7 @@ struct SiteDetails: View {
 //      }
     
   }
+  
   
   func beginLoading () {
     guard let themeDirectoryUrl = Bundle.main.url(forResource: "arctic-fox-theme", withExtension: nil) else {

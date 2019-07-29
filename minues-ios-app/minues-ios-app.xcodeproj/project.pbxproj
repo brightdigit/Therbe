@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B3349A3422EF4FA300F1F69D /* BuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3349A3322EF4FA300F1F69D /* BuildView.swift */; };
 		B33821E922E802DE0085A9AF /* arctic-fox-theme in Resources */ = {isa = PBXBuildFile; fileRef = B33821E822E802DE0085A9AF /* arctic-fox-theme */; };
 		B33CBC5322E6537A000E6925 /* Minues in Frameworks */ = {isa = PBXBuildFile; productRef = B33CBC5222E6537A000E6925 /* Minues */; };
 		B33E94FC22E61EF400AA9939 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33E94FB22E61EF400AA9939 /* AppDelegate.swift */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B3349A3322EF4FA300F1F69D /* BuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildView.swift; sourceTree = "<group>"; };
 		B33821E822E802DE0085A9AF /* arctic-fox-theme */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "arctic-fox-theme"; sourceTree = "<group>"; };
 		B33CBC5122E652C4000E6925 /* Minues */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Minues; path = ../../../../../../../../../Users/leo/Documents/Projects/Minues/Minues; sourceTree = "<group>"; };
 		B33E94F822E61EF400AA9939 /* minues-ios-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "minues-ios-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -86,6 +88,7 @@
 				B38F0D2122E79F9A008E3D0A /* SiteList.swift */,
 				B342267D22E7DA6C002E76FE /* SiteDetails.swift */,
 				B342268022E7E088002E76FE /* ActivitiyIndicatorView.swift */,
+				B3349A3322EF4FA300F1F69D /* BuildView.swift */,
 			);
 			path = "minues-ios-app";
 			sourceTree = "<group>";
@@ -170,6 +173,7 @@
 				B33E94FC22E61EF400AA9939 /* AppDelegate.swift in Sources */,
 				B38F0D2222E79F9A008E3D0A /* SiteList.swift in Sources */,
 				B33E94FE22E61EF400AA9939 /* SceneDelegate.swift in Sources */,
+				B3349A3422EF4FA300F1F69D /* BuildView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -15,7 +15,8 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0"),
         .package(url: "https://github.com/stencilproject/Stencil.git", from: "0.13.1"),
-        .package(url: "https://github.com/brightdigit/Down.git", .branch("master"))
+        .package(url: "https://github.com/brightdigit/Down.git", .branch("master")),
+        .package( url: "https://github.com/robinwalterfit/Swift-Sass.git", from: "1.0.0" )
 
     ],
     targets: [

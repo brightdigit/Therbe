@@ -8,9 +8,9 @@
 import Foundation
 
 
-public struct MarkdownEntry {
+public struct Entry {
   public let frontMatter: FrontMatter
-  public let markdown: String
+  public let content: String
   public let url : URL
   
   var text : String {
@@ -18,7 +18,7 @@ public struct MarkdownEntry {
 ---
 \(self.frontMatter.yaml)
 ---
-\(self.markdown.trimmingCharacters(in: .whitespacesAndNewlines))
+\(self.content.trimmingCharacters(in: .whitespacesAndNewlines))
 """
   }
 }

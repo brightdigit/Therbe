@@ -1,17 +1,36 @@
 ---
-layout: default
+layout: page
 ---
 
-<div class="home">
+<!DOCTYPE html>
+<html>
 
-  <h1 class="page-heading">{{ site.title }}</h1>
+  {% include head.html %}
 
-  <ul class="post-list">
-    {% for post in site.posts %}
-      <li>
-        <!-- <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span> -->
-        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-      </li>
-    {% endfor %}
-  </ul>
-</div>
+  <body>
+
+    {% include header.html %}
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="home">
+
+          <h1 class="page-heading">{{ site.title }}</h1>
+
+          <ul class="post-list">
+            {% for post in site.posts %}
+              <li>
+                <!-- <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span> -->
+                <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    {% include footer.html %}
+
+  </body>
+</html>
+

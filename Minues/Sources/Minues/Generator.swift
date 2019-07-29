@@ -32,10 +32,10 @@ class ResultListBuilder<Element> {
 public class Generator   {
   let destinationURL : URL
   let count : Int
-  let callback : (ResultList<MarkdownEntry>) -> ()
+  let callback : (ResultList<Entry>) -> ()
   let group = DispatchGroup()
   var tasks : [URLSessionDownloadTask]!
-  let resultListBuilder = ResultListBuilder<MarkdownEntry>()
+  let resultListBuilder = ResultListBuilder<Entry>()
   
   let photoURLTemplate = "https://picsum.photos/id/%d/%d/%d"
   let markdownUrl = URL(string: "https://jaspervdj.be/lorem-markdownum/markdown.txt")!
@@ -60,7 +60,7 @@ public class Generator   {
     return currentState ?? .suspended
   }
   
-  init (destinationURL: URL, count: Int, callback: @escaping (ResultList<MarkdownEntry>) -> ()) {
+  init (destinationURL: URL, count: Int, callback: @escaping (ResultList<Entry>) -> ()) {
     self.destinationURL = destinationURL
     self.count = count
     self.callback = callback
@@ -71,7 +71,7 @@ public class Generator   {
     }
   }
   
-  public static func generate(_ count: Int, markdownFilesAt directoryURL: URL, _ completed: @escaping (ResultList<MarkdownEntry>) -> ()) -> Generator {
+  public static func generate(_ count: Int, markdownFilesAt directoryURL: URL, _ completed: @escaping (ResultList<Entry>) -> ()) -> Generator {
     let generator = Generator(destinationURL: directoryURL, count: count, callback: completed)
     generator.begin()
     return generator
@@ -98,7 +98,7 @@ public class Generator   {
       }
     }
     let entryResult = stringResult.flatMap { (markdown) in
-      return Result { () -> MarkdownEntry in
+      return Result { () -> Entry in
         var foundTitle: String?
         var newMarkdown = markdown
         let results = markdown =~ "(#+)\\s(.+)"
@@ -124,7 +124,7 @@ public class Generator   {
         let fileName = title.slugify() + ".md"
         let fileURL = self.destinationURL.appendingPathComponent(fileName)
         let frontMatter = FrontMatter(title: title, date: date, tags: ["a", "b", "c"], categories: ["a", "b", "c"], cover_image: URL(string: String(format: photoURLTemplate, Int.random(in: 1...1000), 1920, 960))!)
-        return MarkdownEntry(frontMatter: frontMatter, markdown: newMarkdown, url: fileURL)
+        return Entry(frontMatter: frontMatter, content: newMarkdown, url: fileURL)
       }
       
     }
@@ -139,8 +139,8 @@ public class Generator   {
   }
 
   
-  static fileprivate func write(_ entryResult: Result<MarkdownEntry, Error>)  throws -> MarkdownEntry {
-    let entry : MarkdownEntry
+  static fileprivate func write(_ entryResult: Result<Entry, Error>)  throws -> Entry {
+    let entry : Entry
     entry = try entryResult.get()
     
     try entry.text.write(to: entry.url, atomically: false, encoding: .utf8)

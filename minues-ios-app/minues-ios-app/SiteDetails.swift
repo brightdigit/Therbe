@@ -24,13 +24,13 @@ extension EntryType {
   }
 }
 
-protocol Entry {
+protocol EntryProtocol {
   var type : EntryType { get }
   var name : String { get }
   var id : UUID { get }
 }
 
-struct BasicEntry : Entry {
+struct BasicEntry : EntryProtocol {
   let type: EntryType
   
   let url: URL
@@ -48,7 +48,7 @@ class SitePreparation {
 
 struct SiteDetails: View {
   let site : Site
-  @State var result : Result<[Entry], Error>?
+  @State var result : Result<[EntryProtocol], Error>?
   @State var isPresented = false
   var isActive : Bool {
     let items = result.flatMap{ try? $0.get()}
@@ -68,7 +68,7 @@ struct SiteDetails: View {
       .onAppear(perform: self.beginLoading)
       .sheet(isPresented: $isPresented, content: {
         NavigationView{
-          BuildView(site: self.site)
+          BuildView(site: self.site, destinationURL: URL.temporaryDirectory())
             .navigationBarItems(trailing:
               Button("Cancel") {
                 self.isPresented = false
@@ -99,7 +99,7 @@ struct SiteDetails: View {
       let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
         (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
       }
-      let items = urls?.compactMap({ (url) -> Entry? in
+      let items = urls?.compactMap({ (url) -> EntryProtocol? in
         let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
         if isDirectory {
           let pages = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .init()).contains {
@@ -154,7 +154,9 @@ struct SiteDetails: View {
 #if DEBUG
 struct SiteDetails_Previews: PreviewProvider {
   static var previews: some View {
-    SiteDetails(site: Site(title: "Lorem Ipsum"))
+    let details = SiteDetails(site: Site(title: "Lorem Ipsum"))
+    details.isPresented = true
+    return details
   }
 }
 #endif

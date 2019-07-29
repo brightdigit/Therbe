@@ -23,16 +23,6 @@ struct Directories {
     self.documentDirectoryUrl = documentDirURL
     self.sitesDirectoryUrl = self.documentDirectoryUrl.appendingPathComponent("sites", isDirectory: true)
   }
-//  func getDirectoryURL() throws -> URL {
-//    
-//      let documentDirectoryUrls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-//      guard let documentDirURL = documentDirectoryUrls.first else {
-//        throw NoDocumentDirectoryError()
-//      }
-//      let markdownDirectoryURL = documentDirURL.appendingPathComponent("sites", isDirectory: true).appendingPathComponent(self.siteName, isDirectory: true).appendingPathComponent("posts", isDirectory: true)
-//      try  FileManager.default.createDirectory(at: markdownDirectoryURL, withIntermediateDirectories: true, attributes: nil)
-//      return markdownDirectoryURL
-//    }
 }
 
 struct DirectoryList: View {
@@ -62,7 +52,7 @@ struct DirectoryList: View {
       self.showError = self.lastError != nil
     }
   }
-  @State var result : ResultList<MarkdownEntry>? {
+  @State var result : ResultList<Entry>? {
     didSet {
       if case let .failure(error) = result {
         self.lastError = error
@@ -121,7 +111,7 @@ struct DirectoryList: View {
     }
     
     
-    let destinationDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+    let destinationDirectoryURL = URL.temporaryDirectory()
     print(destinationDirectoryURL)
     let group = DispatchGroup()
     

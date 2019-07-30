@@ -459,6 +459,14 @@ public struct Minues {
   public init () {
     
   }
+  public func yaml(fromURL url: URL) throws -> [String : Any] {
+    let text = try String(contentsOf: url)
+    
+    guard let yaml = try Yams.load(yaml: text) as? [String : Any] else {
+      throw NoDataError()
+    }
+    return yaml
+  }
   public func run (fromString encodedYAML: String) throws -> String {
     //    let components = try componentsFromMarkdown(encodedYAML)
     //    if let dictionary = components.frontMatter as? [String : Any] {

@@ -87,7 +87,7 @@ struct SiteList: View {
       }))
     }.sheet(isPresented: $isPresented) {
       NavigationView{
-        NewSiteView(themes: [Theme(title: "Article Fox")])
+        NewSiteView()
         .navigationBarItems(trailing: HStack{
           Button(action: self.hideSite) {
             Text("Cancel")

@@ -30,7 +30,7 @@
 
           <div class="trigger">
               <a class="page-link" href="{{ site.baseurl }}/">Home</a>
-            {% for page in site.pages %}
+            {% for page in pages %}
               {% if page.title %}
               <a class="page-link" href="{{ site.baseurl }}{{ page.url }}">{{ page.title }}</a>
               {% endif %}

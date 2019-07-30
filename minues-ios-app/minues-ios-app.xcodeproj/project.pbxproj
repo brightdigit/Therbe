@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B3349A3422EF4FA300F1F69D /* BuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3349A3322EF4FA300F1F69D /* BuildView.swift */; };
-		B33821E922E802DE0085A9AF /* arctic-fox-theme in Resources */ = {isa = PBXBuildFile; fileRef = B33821E822E802DE0085A9AF /* arctic-fox-theme */; };
+		B33821E922E802DE0085A9AF /* themes in Resources */ = {isa = PBXBuildFile; fileRef = B33821E822E802DE0085A9AF /* themes */; };
 		B33CBC5322E6537A000E6925 /* Minues in Frameworks */ = {isa = PBXBuildFile; productRef = B33CBC5222E6537A000E6925 /* Minues */; };
 		B33E94FC22E61EF400AA9939 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33E94FB22E61EF400AA9939 /* AppDelegate.swift */; };
 		B33E94FE22E61EF400AA9939 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33E94FD22E61EF400AA9939 /* SceneDelegate.swift */; };
@@ -17,12 +17,13 @@
 		B342267E22E7DA6C002E76FE /* SiteDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = B342267D22E7DA6C002E76FE /* SiteDetails.swift */; };
 		B342268122E7E088002E76FE /* ActivitiyIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B342268022E7E088002E76FE /* ActivitiyIndicatorView.swift */; };
 		B38F0D2222E79F9A008E3D0A /* SiteList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38F0D2122E79F9A008E3D0A /* SiteList.swift */; };
+		B39E1B8A22F07062007B4D45 /* NewSiteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E1B8922F07062007B4D45 /* NewSiteView.swift */; };
 		B3FC529022E73C1C00C14386 /* DirectoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3FC528F22E73C1C00C14386 /* DirectoryList.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		B3349A3322EF4FA300F1F69D /* BuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildView.swift; sourceTree = "<group>"; };
-		B33821E822E802DE0085A9AF /* arctic-fox-theme */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "arctic-fox-theme"; sourceTree = "<group>"; };
+		B33821E822E802DE0085A9AF /* themes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = themes; sourceTree = "<group>"; };
 		B33CBC5122E652C4000E6925 /* Minues */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Minues; path = ../../../../../../../../../Users/leo/Documents/Projects/Minues/Minues; sourceTree = "<group>"; };
 		B33E94F822E61EF400AA9939 /* minues-ios-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "minues-ios-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B33E94FB22E61EF400AA9939 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -34,6 +35,7 @@
 		B342267F22E7DF07002E76FE /* minues-ios-app.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "minues-ios-app.entitlements"; sourceTree = "<group>"; };
 		B342268022E7E088002E76FE /* ActivitiyIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiyIndicatorView.swift; sourceTree = "<group>"; };
 		B38F0D2122E79F9A008E3D0A /* SiteList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteList.swift; sourceTree = "<group>"; };
+		B39E1B8922F07062007B4D45 /* NewSiteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSiteView.swift; sourceTree = "<group>"; };
 		B3FC528F22E73C1C00C14386 /* DirectoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -77,7 +79,7 @@
 		B33E94FA22E61EF400AA9939 /* minues-ios-app */ = {
 			isa = PBXGroup;
 			children = (
-				B33821E822E802DE0085A9AF /* arctic-fox-theme */,
+				B33821E822E802DE0085A9AF /* themes */,
 				B342267F22E7DF07002E76FE /* minues-ios-app.entitlements */,
 				B33E94FB22E61EF400AA9939 /* AppDelegate.swift */,
 				B33E94FD22E61EF400AA9939 /* SceneDelegate.swift */,
@@ -89,6 +91,7 @@
 				B342267D22E7DA6C002E76FE /* SiteDetails.swift */,
 				B342268022E7E088002E76FE /* ActivitiyIndicatorView.swift */,
 				B3349A3322EF4FA300F1F69D /* BuildView.swift */,
+				B39E1B8922F07062007B4D45 /* NewSiteView.swift */,
 			);
 			path = "minues-ios-app";
 			sourceTree = "<group>";
@@ -154,7 +157,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B33821E922E802DE0085A9AF /* arctic-fox-theme in Resources */,
+				B33821E922E802DE0085A9AF /* themes in Resources */,
 				B33E950822E61EF900AA9939 /* LaunchScreen.storyboard in Resources */,
 				B33E950522E61EF900AA9939 /* Assets.xcassets in Resources */,
 			);
@@ -173,6 +176,7 @@
 				B33E94FC22E61EF400AA9939 /* AppDelegate.swift in Sources */,
 				B38F0D2222E79F9A008E3D0A /* SiteList.swift in Sources */,
 				B33E94FE22E61EF400AA9939 /* SceneDelegate.swift in Sources */,
+				B39E1B8A22F07062007B4D45 /* NewSiteView.swift in Sources */,
 				B3349A3422EF4FA300F1F69D /* BuildView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

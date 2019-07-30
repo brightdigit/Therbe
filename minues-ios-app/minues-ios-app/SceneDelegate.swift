@@ -20,15 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
      if let windowScene = scene as? UIWindowScene {
          let window = UIWindow(windowScene: windowScene)
-      window.rootViewController = UIHostingController(rootView: SiteList(sites: [
-            Site(title: "Epsum factorial"),
-              Site(title: "Non deposit"),
-              Site(title: "Pro"),
-              Site(title: "Quo hic"),
-              Site(title: "Olypian"),
-              Site(title: "Quarrels et"),
-              Site(title: "Congolium")
-          ]))
+      window.rootViewController = UIHostingController(rootView: SiteList(sites: [Site]() ))
          self.window = window
          window.makeKeyAndVisible()
      }

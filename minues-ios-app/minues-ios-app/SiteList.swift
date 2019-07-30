@@ -70,6 +70,7 @@ struct Site {
 
 struct SiteList: View {
   @State var sites : [Site]
+  @State var isPresented = false
   var body: some View {
     NavigationView{
       List(self.sites, id: \.id) { (site) in
@@ -84,7 +85,26 @@ struct SiteList: View {
         }
         }
       }.navigationBarTitle("Sites")
+        .navigationBarItems(trailing: Button(action: self.newSite, label: {
+          Text("New")
+      }))
+    }.sheet(isPresented: $isPresented) {
+      NavigationView{
+      NewSiteView()
+        .navigationBarItems(trailing: HStack{
+          Button(action: self.hideSite) {
+            Text("Cancel")
+          }
+        })
+      }
     }
+  }
+
+  func hideSite () {
+    self.isPresented = false
+  }
+  func newSite () {
+    self.isPresented = true
   }
 }
 

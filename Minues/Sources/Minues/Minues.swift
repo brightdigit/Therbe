@@ -269,6 +269,10 @@ struct SiteDetailsEnumerator {
   }
 }
 
+enum ContentType {
+  case page, post
+}
+
 public struct Builder {
   
   public init () {
@@ -290,8 +294,7 @@ public struct Builder {
     
     let includes : [String : Any]
     let layouts  : [String : Any]
-    let posts : [[String : Any]]
-    let content : [String : String]
+    let content : [(String, String)]
         includes = [String : [IncludeProtocol]](grouping: site.includes, by: {
           $0.name
         }).compactMapValues{
@@ -315,89 +318,89 @@ public struct Builder {
 
     
     let minues = Minues()
-      posts = site.content.filter{ $0.isPost }.compactMap{
-        (file) -> [String : Any]? in
-        guard let text = try? file.contents() else {
-                    return nil
-                  }
-                  guard let components = try? minues.componentsFromMarkdown(text) else {
-                    return nil
-                  }
-        let (pageAny, str) = components
-        
-        guard let page = pageAny as? [String : Any] else {
-          return nil
-        }
-        
-        if let dateAny = page["date"] {
-          guard let date = dateAny as? Date else {
-            return nil
-          }
-          
-          guard date < Date() else {
-            return nil
-          }
-        }
-        
-        return page
-      }.sorted(by: { (lhs, rhs) -> Bool in
-        let lhsDate = lhs["date"].flatMap{ $0 as? Date } ?? Date.distantPast
-        let rhsDate = rhs["date"].flatMap{ $0 as? Date } ?? Date.distantPast
-        return lhsDate > rhsDate
-      })
+    let allContent = site.content.compactMap{
+            (file) -> [String : Any]? in
+            guard let text = try? file.contents() else {
+                        return nil
+                      }
+                      guard let components = try? minues.componentsFromMarkdown(text) else {
+                        return nil
+                      }
+            let (pageAny, str) = components
+            
+            guard var page = pageAny as? [String : Any] else {
+              return nil
+            }
+            
+            if let dateAny = page["date"] {
+              guard let date = dateAny as? Date else {
+                return nil
+              }
+              
+              guard date < Date() else {
+                return nil
+              }
+            }
+            
+      page["url"] = file.name == "index" ? "index.html" : [file.name, "index.html"].joined(separator: "/")
+            page["isPost"] = file.isPost
+            
+            return page
+          }.sorted(by: { (lhs, rhs) -> Bool in
+            let lhsDate = lhs["date"].flatMap{ $0 as? Date } ?? Date.distantPast
+            let rhsDate = rhs["date"].flatMap{ $0 as? Date } ?? Date.distantPast
+            return lhsDate > rhsDate
+          })
+    let contentDictionary = Dictionary<ContentType, [[String : Any]]>(grouping: allContent, by: { ($0["isPost"] as? Bool ?? false)  ? .post : .page})
       
     
-    
-      content = [ String: [ContentProtocol]](grouping: site.content, by: {
-        $0.relativePath
-      }).compactMapValues{
-        $0.compactMap { (file) -> String? in
-          print(file.name)
-          guard let text = try? file.contents() else {
-            return nil
-          }
-          guard let components = try? minues.componentsFromMarkdown(text) else {
-            return nil
-          }
-          let (pageAny, str) = components
-          let htmlRendered : String?
-          if file.isMarkdown {
+     content = site.content.compactMap { (file) -> (String, String)? in
+              print(file.name)
+              guard let text = try? file.contents() else {
+                return nil
+              }
+              guard let components = try? minues.componentsFromMarkdown(text) else {
+                return nil
+              }
+              let (pageAny, str) = components
+              let htmlRendered : String?
+              if file.isMarkdown {
 
-            let down = Down(markdownString: str)
-            htmlRendered = try? down.toHTML()
-          } else {
-            htmlRendered = str
-          }
-          
-          guard let page = pageAny as? [String : Any] else {
-            return nil
-          }
-          guard let html = htmlRendered else {
-            return nil
-          }
-          guard let layoutName = page["layout"] as? String else {
-            return nil
-          }
-          var context : [String : Any] = ["site" : site.configuration.context, "page" : page, "posts" : posts]
-          guard let contentHtml = try? environment.renderTemplate(string: html, context: context) else {
-            return nil
-          }
-          context["content"] = contentHtml
-          
-          guard let layout = layouts[layoutName] as? String else {
-            return nil
-          }
-          do {
-            return try environment.renderTemplate(string: layout, context: context)
-          } catch let error {
-            debugPrint(error)
-            return nil
-          }
-        }.first
-      }
+                let down = Down(markdownString: str)
+                htmlRendered = try? down.toHTML()
+              } else {
+                htmlRendered = str
+              }
+              
+              guard let page = pageAny as? [String : Any] else {
+                return nil
+              }
+              guard let html = htmlRendered else {
+                return nil
+              }
+              guard let layoutName = page["layout"] as? String else {
+                return nil
+              }
+      let path = file.name == "index" ? "index.html" : [file.name, "index.html"].joined(separator: "/")
+              var context : [String : Any] = ["site" : site.configuration.context, "page" : page, "posts" : contentDictionary[.post], "pages" : contentDictionary[.page]]
+              guard let contentHtml = try? environment.renderTemplate(string: html, context: context) else {
+                return nil
+              }
+              context["content"] = contentHtml
+              
+              guard let layout = layouts[layoutName] as? String else {
+                return nil
+              }
+              do {
+                return (path, try environment.renderTemplate(string: layout, context: context))
+              } catch let error {
+                debugPrint(error)
+                return nil
+              }
+    }
       
       for (pathComponent, text) in content {
-        let fileUrl = destinationURL.appendingPathComponent(pathComponent).deletingPathExtension().appendingPathExtension("html")
+        let fileUrl = destinationURL.appendingPathComponent(pathComponent)
         let directoryUrl = fileUrl.deletingLastPathComponent()
         
         do {

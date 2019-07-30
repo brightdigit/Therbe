@@ -95,7 +95,7 @@ struct SiteDetails: View {
     try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
     print(siteDirectoryUrl)
     let postsUrl = siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true)
-    _ = Generator.generate(20, markdownFilesAt: postsUrl) { (_) in
+    _ = Generator.generate(100, markdownFilesAt: postsUrl) { (_) in
       let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
         (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
       }

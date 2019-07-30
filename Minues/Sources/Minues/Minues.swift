@@ -556,7 +556,7 @@ public struct Minues {
     throw NotImplementedError()
   }
   
-  fileprivate func setupSite(_ site: Site, withTheme theme: Theme, _ completed : @escaping (Error?) -> Void) {
+  public func setupSite(_ site: Site, withTheme theme: Theme, _ completed : @escaping (Error?) -> Void) {
       let siteDirectoryUrl = site.documentsURL
       let themeDirectoryUrl = theme.directoryURL
       var isDirectory : ObjCBool = false

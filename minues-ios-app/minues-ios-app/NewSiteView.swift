@@ -77,6 +77,29 @@ struct NewSiteView: View {
   }
   
   func beginBuild () {
+    let minues = Minues()
+    
+    let chosenTheme =  self.themes.flatMap{ try? $0.get() }.flatMap{ $0[self.pickedThemeIndex] }
+    
+    guard let theme = chosenTheme else {
+      return
+    }
+    let site = Site(title: self.siteTitle)
+    minues.setupSite(site, withTheme: theme) { (error) in
+      if let error = error {
+        return
+      }
+      let builder = Builder()
+      let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+      builder.build(fromSourceDirectory: site.documentsURL, toDestinationDirectory: destinationURL, self.onProgress, completed: self.onCompleted)
+    }
+  }
+  
+  func onProgress (_ progres : BuilderProgress) {
+    
+  }
+  
+  func onCompleted (_ error: Error?) {
     
   }
   

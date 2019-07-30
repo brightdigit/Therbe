@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftUI
+import Minues
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 

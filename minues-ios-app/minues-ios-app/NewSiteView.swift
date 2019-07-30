@@ -10,24 +10,7 @@ import SwiftUI
 import Minues
 
 
-struct Theme : Hashable  {
-  let title : String
-  let directoryURL : URL
-  
-  init?(configURL : URL) {
-    
-    let minues = Minues()
-    guard let config = try? minues.yaml(fromURL: configURL) else {
-      return nil
-    }
-    
-    guard let title = config["title"] as? String else {
-      return nil
-    }
-    self.title = title
-    self.directoryURL = configURL.deletingLastPathComponent()
-  }
-}
+
 struct NewSiteView: View {
   var readyForBuild : Bool {
     return !(siteTitle.isEmpty)

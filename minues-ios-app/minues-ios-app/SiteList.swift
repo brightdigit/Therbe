@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+import Minues
 
 struct URLImage : View {
   let url : URL
@@ -40,29 +41,6 @@ struct URLImage : View {
   }
 }
 
-struct Site {
-  let title : String
-  let logoUrl : URL
-  let id : UUID
-  let domainName : String
-  
-  var documentsURL : URL {
-    return Directories.shared.sitesDirectoryUrl.appendingPathComponent(id.uuidString)
-  }
-  #if DEBUG
-  
-  
-  init (title: String, photoId: Int? = nil, id: UUID? = nil, domainName : String? = nil) {
-    self.title = title
-    self.id = id ?? UUID()
-    let photoId = photoId ?? Int.random(in: 1...1000)
-    self.logoUrl = URL(string: .init(format: "https://picsum.photos/id/%d/%d/%d", photoId, 1024, 1024))!
-    self.domainName = title.filter{
-      !$0.isWhitespace && !$0.isNewline
-    }.lowercased() + ".com"
-  }
-  #endif
-}
 
 
 struct SiteList: View {

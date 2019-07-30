@@ -4,6 +4,77 @@ import Stencil
 import Foundation
 import PathKit
 
+
+struct NoDocumentDirectoryError : Error {}
+
+
+public extension Result {
+  public var error : Error? {
+    if case let .failure(error) = self {
+      return error
+    } else {
+      return nil
+    }
+  }
+}
+
+public struct Directories {
+  public static let shared = try! Directories()
+  public let documentDirectoryUrl : URL
+  public let sitesDirectoryUrl : URL
+  init (fromUrlFor searchPath: FileManager.SearchPathDirectory? = .documentDirectory, in domainMask: FileManager.SearchPathDomainMask = .userDomainMask) throws {
+    let documentDirectoryUrls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+          guard let documentDirURL = documentDirectoryUrls.first else {
+            throw NoDocumentDirectoryError()
+          }
+    self.documentDirectoryUrl = documentDirURL
+    self.sitesDirectoryUrl = self.documentDirectoryUrl.appendingPathComponent("sites", isDirectory: true)
+  }
+}
+
+public struct Site {
+  public let title : String
+  public let logoUrl : URL
+  public let id : UUID
+  public let domainName : String
+  
+  public var documentsURL : URL {
+    return Directories.shared.sitesDirectoryUrl.appendingPathComponent(id.uuidString)
+  }
+  #if DEBUG
+  
+  
+  public init (title: String, photoId: Int? = nil, id: UUID? = nil, domainName : String? = nil) {
+    self.title = title
+    self.id = id ?? UUID()
+    let photoId = photoId ?? Int.random(in: 1...1000)
+    self.logoUrl = URL(string: .init(format: "https://picsum.photos/id/%d/%d/%d", photoId, 1024, 1024))!
+    self.domainName = title.filter{
+      !$0.isWhitespace && !$0.isNewline
+    }.lowercased() + ".com"
+  }
+  #endif
+}
+
+public struct Theme : Hashable  {
+  public let title : String
+  public let directoryURL : URL
+  
+  public init?(configURL : URL) {
+    
+    let minues = Minues()
+    guard let config = try? minues.yaml(fromURL: configURL) else {
+      return nil
+    }
+    
+    guard let title = config["title"] as? String else {
+      return nil
+    }
+    self.title = title
+    self.directoryURL = configURL.deletingLastPathComponent()
+  }
+}
+
 public extension URL {
   func pathComponentIndex(commonWith base: URL) -> Int? {
     // Ensure that both URLs represent files:
@@ -485,6 +556,48 @@ public struct Minues {
     throw NotImplementedError()
   }
   
+  fileprivate func setupSite(_ site: Site, withTheme theme: Theme, _ completed : @escaping (Error?) -> Void) {
+      let siteDirectoryUrl = site.documentsURL
+      let themeDirectoryUrl = theme.directoryURL
+      var isDirectory : ObjCBool = false
+      let isExists = FileManager.default.fileExists(atPath: siteDirectoryUrl.path, isDirectory: &isDirectory)
+      if isExists && !isDirectory.boolValue {
+        try? FileManager.default.removeItem(at: siteDirectoryUrl)
+      }
+      
+      try? FileManager.default.createDirectory(at: Directories.shared.sitesDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
+      try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
+      print(siteDirectoryUrl)
+      let postsUrl = siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true)
+      _ = Generator.generate(100, markdownFilesAt: postsUrl) { (result) in
+  //      let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
+  //        (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
+  //      }
+  //      let items = urls?.compactMap({ (url) -> EntryProtocol? in
+  //        let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
+  //        if isDirectory {
+  //          let pages = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .init()).contains {
+  //            ["html", "md", "markdown"].contains($0.pathExtension)
+  //          }
+  //          if pages == true {
+  //            return BasicEntry(type: .folder, url: url)
+  //          }
+  //        } else {
+  //          return BasicEntry(type: .page, url: url)
+  //        }
+  //        return nil
+  //      })
+        
+        completed(result.error)
+  //        Result {
+  //                guard let items = items else {
+  //                  throw NoDocumentDirectoryError()
+  //                }
+  //                return items
+  //              }
+        //)
+      }
+    }
   
   fileprivate func componentsFromMarkdown(_ text: String) throws -> (frontMatter : Any?, content: String) {
     let result = text =~ "^-{3}\n([\\s\\S]*?)\n-{3}\n"

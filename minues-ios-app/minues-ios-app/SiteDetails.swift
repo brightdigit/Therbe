@@ -9,6 +9,7 @@
 import SwiftUI
 import Minues
 
+
 enum EntryType {
   case folder, page
 }
@@ -79,12 +80,9 @@ struct SiteDetails: View {
     
   }
   
-  
-  func beginLoading () {
-    guard let themeDirectoryUrl = Bundle.main.url(forResource: "arctic-fox-theme", withExtension: nil) else {
-      return
-    }
-    let siteDirectoryUrl = self.site.documentsURL
+  fileprivate func setupSite(_ site: Site, withTheme theme: Theme, _ completed : @escaping (Error?) -> Void) {
+    let siteDirectoryUrl = site.documentsURL
+    let themeDirectoryUrl = theme.directoryURL
     var isDirectory : ObjCBool = false
     let isExists = FileManager.default.fileExists(atPath: siteDirectoryUrl.path, isDirectory: &isDirectory)
     if isExists && !isDirectory.boolValue {
@@ -95,32 +93,42 @@ struct SiteDetails: View {
     try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
     print(siteDirectoryUrl)
     let postsUrl = siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true)
-    _ = Generator.generate(100, markdownFilesAt: postsUrl) { (_) in
-      let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
-        (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
-      }
-      let items = urls?.compactMap({ (url) -> EntryProtocol? in
-        let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
-        if isDirectory {
-          let pages = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .init()).contains {
-            ["html", "md", "markdown"].contains($0.pathExtension)
-          }
-          if pages == true {
-            return BasicEntry(type: .folder, url: url)
-          }
-        } else {
-          return BasicEntry(type: .page, url: url)
-        }
-        return nil
-      })
+    _ = Generator.generate(100, markdownFilesAt: postsUrl) { (result) in
+//      let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
+//        (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
+//      }
+//      let items = urls?.compactMap({ (url) -> EntryProtocol? in
+//        let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
+//        if isDirectory {
+//          let pages = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .init()).contains {
+//            ["html", "md", "markdown"].contains($0.pathExtension)
+//          }
+//          if pages == true {
+//            return BasicEntry(type: .folder, url: url)
+//          }
+//        } else {
+//          return BasicEntry(type: .page, url: url)
+//        }
+//        return nil
+//      })
       
-      self.result = Result {
-        guard let items = items else {
-          throw NoDocumentDirectoryError()
-        }
-        return items
-      }
+      completed(result.error)
+//        Result {
+//                guard let items = items else {
+//                  throw NoDocumentDirectoryError()
+//                }
+//                return items
+//              }
+      //)
     }
+  }
+  
+  func beginLoading () {
+//    guard let themeDirectoryUrl = Bundle.main.url(forResource: "arctic-fox-theme", withExtension: nil) else {
+//      return
+//    }
+    //let siteDirectoryUrl = self.site.documentsURL
+    //setupSite(siteDirectoryUrl, withTheme: <#Theme#>, themeDirectoryUrl)
     
   }
   

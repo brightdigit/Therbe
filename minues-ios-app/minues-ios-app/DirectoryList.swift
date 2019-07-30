@@ -9,22 +9,6 @@
 import Minues
 import SwiftUI
 
-struct NoDocumentDirectoryError : Error {}
-
-struct Directories {
-  static let shared = try! Directories()
-  let documentDirectoryUrl : URL
-  let sitesDirectoryUrl : URL
-  init (fromUrlFor searchPath: FileManager.SearchPathDirectory? = .documentDirectory, in domainMask: FileManager.SearchPathDomainMask = .userDomainMask) throws {
-    let documentDirectoryUrls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-          guard let documentDirURL = documentDirectoryUrls.first else {
-            throw NoDocumentDirectoryError()
-          }
-    self.documentDirectoryUrl = documentDirURL
-    self.sitesDirectoryUrl = self.documentDirectoryUrl.appendingPathComponent("sites", isDirectory: true)
-  }
-}
-
 struct DirectoryList: View {
   let siteName : String
   let dateFormatter = { () -> DateFormatter in
@@ -91,7 +75,7 @@ struct DirectoryList: View {
         .navigationBarTitle(Text("\(self.siteName) Posts"))
         
         .navigationBarItems(trailing: HStack{
-          Button(action: self.generate){ Text("Generate")}.disabled(isGenerating != nil)
+          //Button(action: self.generate){ Text("Generate")}.disabled(isGenerating != nil)
           Button(action: self.process){ Text("Process")}.disabled(!processingReady)
         })
       
@@ -173,15 +157,15 @@ struct DirectoryList: View {
     
   }
   
-  func generate () {
-    let markdownDirectoryURL: URL
-    markdownDirectoryURL = Directories.shared.sitesDirectoryUrl.appendingPathComponent(self.siteName, isDirectory: true).appendingPathComponent("posts", isDirectory: true)
-    
-    let generator = Generator.generate(20, markdownFilesAt: markdownDirectoryURL) { (result) in
-      self.result = result
-    }
-    self.generator = generator
-  }
+//  func generate () {
+//    let markdownDirectoryURL: URL
+//    markdownDirectoryURL = Directories.shared.sitesDirectoryUrl.appendingPathComponent(self.siteName, isDirectory: true).appendingPathComponent("posts", isDirectory: true)
+//    
+//    let generator = Generator.generate(20, markdownFilesAt: markdownDirectoryURL) { (result) in
+//      self.result = result
+//    }
+//    self.generator = generator
+//  }
 }
 
 #if DEBUG

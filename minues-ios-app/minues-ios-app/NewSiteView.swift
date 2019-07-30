@@ -15,7 +15,7 @@ struct Theme : Hashable  {
   let directoryURL : URL
   
   init?(configURL : URL) {
-
+    
     let minues = Minues()
     guard let config = try? minues.yaml(fromURL: configURL) else {
       return nil
@@ -29,29 +29,37 @@ struct Theme : Hashable  {
   }
 }
 struct NewSiteView: View {
-  @State var pickedTheme : Theme?
+  var readyForBuild : Bool {
+    return !(siteTitle.isEmpty)
+  }
+  @State var siteTitle : String = ""
+  @State var pickedThemeIndex = 0
   @State var themes : Result<[Theme], Error>?
   let loadingDirectoryUrl : URL = Bundle.main.url(forResource: "themes", withExtension: nil)!
   var body: some View {
     ZStack{
-      busyView.onAppear {
-        var themeConfigs = [URL]()
-        guard let enumerator = FileManager.default.enumerator(at: self.loadingDirectoryUrl, includingPropertiesForKeys: nil) else {
-          return
-        }
-        while let url = enumerator.nextObject() as? URL {
-          if url.lastPathComponent == "_config.yml" {
-            themeConfigs.append(url)
-          }
-        }
-        self.themes = .success(themeConfigs.compactMap(Theme.init(configURL:)))
+      busyView.onAppear(perform: self.beginLoad)
+      errorView
+      inputView
+    }
+    
+  }
+  
+  func beginLoad () {
+    var themeConfigs = [URL]()
+    guard let enumerator = FileManager.default.enumerator(at: self.loadingDirectoryUrl, includingPropertiesForKeys: nil) else {
+      return
+    }
+    while let url = enumerator.nextObject() as? URL {
+      if url.lastPathComponent == "_config.yml" {
+        themeConfigs.append(url)
       }
     }
-
+    self.themes = .success(themeConfigs.compactMap(Theme.init(configURL:)))
   }
   
   var busyView : some View {
-    let loading = self.themes == nil ? Void() : nil
+    let loading : Void? = self.themes == nil ? Void() : nil
     return loading.map {
       ActivitiyIndicatorView(style: .large)
     }
@@ -63,18 +71,30 @@ struct NewSiteView: View {
       (try? $0.get()).map {
         (themes) in
         Form{
-                  Section{
-                    Picker(selection: $pickedTheme, label: Text("Theme")) {
-                                            ForEach(0 ..< themes.count) {
-                                                Text(themes[$0].title).tag($0)
-            
-                                            }
-                                        }
-                  }
-                }
+          Section{
+            TextField("Name", text: $siteTitle)
+          }
+          Section{
+            Picker(selection: $pickedThemeIndex, label: Text("Theme")) {
+              ForEach(0 ..< themes.count) {
+                Text(themes[$0].title).tag($0)
+                
+              }
+            }
+          }
+          Section{
+            Button(action: self.beginBuild) {
+              Text("Build")
+            }.disabled(!self.readyForBuild)
+          }
+        }
       }
     }
-        
+    
+  }
+  
+  func beginBuild () {
+    
   }
   
   var errorView : some View {

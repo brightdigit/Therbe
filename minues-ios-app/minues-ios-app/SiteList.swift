@@ -39,9 +39,6 @@ struct URLImage : View {
     }.resume()
   }
 }
-struct Theme {
-  
-}
 
 struct Site {
   let title : String
@@ -90,7 +87,7 @@ struct SiteList: View {
       }))
     }.sheet(isPresented: $isPresented) {
       NavigationView{
-      NewSiteView()
+        NewSiteView(themes: [Theme(title: "Article Fox")])
         .navigationBarItems(trailing: HStack{
           Button(action: self.hideSite) {
             Text("Cancel")

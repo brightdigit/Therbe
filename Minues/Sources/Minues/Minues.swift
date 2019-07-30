@@ -3,6 +3,7 @@ import Down
 import Stencil
 import Foundation
 import PathKit
+import Sass
 
 public extension URL {
   func pathComponentIndex(commonWith base: URL) -> Int? {
@@ -126,6 +127,7 @@ struct SiteFileBuilder : SiteFileBuilderProtocol  {
   var files = [SiteFileType : [URL]]()
   var site: SiteDetailsProtocol {
     SiteDetails(
+      stylesheets: files[.stylesheet]?.map(self.stylesheet(_:)) ?? [StylesheetProtocol](),
       content: files[.content]?.map(self.content(_:)) ?? [ContentProtocol](),
       includes: files[.include]?.map(self.include(_:)) ?? [IncludeProtocol](),
       layouts: files[.layout]?.map(self.layout(_:)) ?? [LayoutProtocol](),
@@ -136,6 +138,10 @@ struct SiteFileBuilder : SiteFileBuilderProtocol  {
     var list : [URL] = files[type] ?? [URL]()
     list.append(url)
     files[type] = list
+  }
+  
+  func stylesheet (_ url: URL) -> StylesheetProtocol {
+    return Stylesheet(baseUrl: self.baseUrl, url: url)
   }
   
   func content (_ url: URL) -> ContentProtocol {
@@ -205,14 +211,37 @@ struct Content : ContentProtocol {
     return url.deletingPathExtension().lastPathComponent
   }
 }
+
+protocol StylesheetProtocol {
+
+  var url : URL { get }
+  var relativePath: String { get }
+}
+
+struct Stylesheet : StylesheetProtocol {
+
+  let baseUrl : URL
+  let url : URL
+  var relativePath: String {
+    guard let index = url.pathComponentIndex(commonWith: self.baseUrl) else {
+      return url.absoluteString
+      
+    }
+    
+    return url.pathComponents[index...].joined(separator: "/")
+  }
+}
 protocol SiteDetailsProtocol {
   var content : [ContentProtocol] { get }
   var includes : [IncludeProtocol] { get }
   var layouts : [LayoutProtocol] { get }
+  var stylesheets : [StylesheetProtocol] { get }
   var configuration : SiteConfigurationProtocol { get }
   var baseUrl : URL { get }
 }
 struct SiteDetails : SiteDetailsProtocol {
+  var stylesheets: [StylesheetProtocol]
+  
   let content: [ContentProtocol]
   
   let includes: [IncludeProtocol]
@@ -287,6 +316,19 @@ public struct Builder {
     
     let environment = Environment(loader: FileSystemLoader(paths: [Path(site.baseUrl.path)]), extensions: nil)
     
+    let options = Sass.Options()
+    
+    let sassObjects = site.stylesheets.map{
+      Sass(context: .file, input: $0.url.path, options: options, outputFile: destinationURL.appendingPathComponent($0.relativePath).path)
+    }
+    
+    do {
+    try sassObjects.forEach{
+      try $0.compile()
+    }
+    } catch let error {
+      return completed(error)
+    }
     
     let includes : [String : Any]
     let layouts  : [String : Any]

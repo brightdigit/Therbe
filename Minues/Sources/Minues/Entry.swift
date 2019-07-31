@@ -1,24 +1,20 @@
-//
-//  File.swift
-//  
-//
-//  Created by Leo Dion on 7/22/19.
-//
+// Entry.swift
+// Copyright (c) 2019 BrightDigit
+// Created by Leo Dion on 7/31/19.
 
 import Foundation
-
 
 public struct Entry {
   public let frontMatter: FrontMatter
   public let content: String
-  public let url : URL
-  
-  var text : String {
+  public let url: URL
+
+  var text: String {
     return """
----
-\(self.frontMatter.yaml)
----
-\(self.content.trimmingCharacters(in: .whitespacesAndNewlines))
-"""
+    ---
+    \(frontMatter.yaml)
+    ---
+    \(content.trimmingCharacters(in: .whitespacesAndNewlines))
+    """
   }
 }

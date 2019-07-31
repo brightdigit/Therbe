@@ -1,304 +1,282 @@
-import Yams
+// Minues.swift
+// Copyright (c) 2019 BrightDigit
+// Created by Leo Dion on 7/31/19.
+
 import Down
-import Stencil
 import Foundation
 import PathKit
+import Stencil
+import Yams
 
-
-struct NoDocumentDirectoryError : Error {}
-
-
-public extension Result {
-  var error : Error? {
-    if case let .failure(error) = self {
-      return error
-    } else {
-      return nil
-    }
-  }
-}
-
-public struct Directories {
-  public static let shared = try! Directories()
-  public let documentDirectoryUrl : URL
-  public let sitesDirectoryUrl : URL
-  init (fromUrlFor searchPath: FileManager.SearchPathDirectory? = .documentDirectory, in domainMask: FileManager.SearchPathDomainMask = .userDomainMask) throws {
-    let documentDirectoryUrls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-    guard let documentDirURL = documentDirectoryUrls.first else {
-      throw NoDocumentDirectoryError()
-    }
-    self.documentDirectoryUrl = documentDirURL
-    self.sitesDirectoryUrl = self.documentDirectoryUrl.appendingPathComponent("sites", isDirectory: true)
-  }
-}
+struct NoDocumentDirectoryError: Error {}
 
 public struct Site {
-  public let title : String
-  public let logoUrl : URL
-  public let id : UUID
-  public let domainName : String
-  
-  public var documentsURL : URL {
+  public let title: String
+  public let logoUrl: URL
+  public let id: UUID
+  public let domainName: String
+
+  public var documentsURL: URL {
     return Directories.shared.sitesDirectoryUrl.appendingPathComponent(id.uuidString)
   }
+
   #if DEBUG
-  
-  
-  public init (title: String, photoId: Int? = nil, id: UUID? = nil, domainName : String? = nil) {
-    self.title = title
-    self.id = id ?? UUID()
-    let photoId = photoId ?? Int.random(in: 1...1000)
-    self.logoUrl = URL(string: .init(format: "https://picsum.photos/id/%d/%d/%d", photoId, 1024, 1024))!
-    self.domainName = title.filter{
-      !$0.isWhitespace && !$0.isNewline
-    }.lowercased() + ".com"
-  }
+
+    public init(title: String, photoId: Int? = nil, id: UUID? = nil, domainName _: String? = nil) {
+      self.title = title
+      self.id = id ?? UUID()
+      let photoId = photoId ?? Int.random(in: 1 ... 1000)
+      logoUrl = URL(string: .init(format: "https://picsum.photos/id/%d/%d/%d", photoId, 1024, 1024))!
+      domainName = title.filter {
+        !$0.isWhitespace && !$0.isNewline
+      }.lowercased() + ".com"
+    }
   #endif
 }
 
-public struct Theme : Hashable  {
-  public let title : String
-  public let directoryURL : URL
-  
-  public init?(configURL : URL) {
-    
+public struct Theme: Hashable {
+  public let title: String
+  public let directoryURL: URL
+
+  public init?(configURL: URL) {
     let minues = Minues()
     guard let config = try? minues.yaml(fromURL: configURL) else {
       return nil
     }
-    
+
     guard let title = config["title"] as? String else {
       return nil
     }
     self.title = title
-    self.directoryURL = configURL.deletingLastPathComponent()
+    directoryURL = configURL.deletingLastPathComponent()
   }
 }
 
 public extension URL {
   func pathComponentIndex(commonWith base: URL) -> Int? {
     // Ensure that both URLs represent files:
-    guard self.isFileURL && base.isFileURL else {
+    guard isFileURL, base.isFileURL else {
       return nil
     }
-    
+
     // Remove/replace "." and "..", make paths absolute:
-    let destComponents = self.standardized.pathComponents
+    let destComponents = standardized.pathComponents
     let baseComponents = base.standardized.pathComponents
-    
+
     // Find number of common path components:
-    var i = 0
-    while i < destComponents.count && i < baseComponents.count
-      && destComponents[i] == baseComponents[i] {
-        i += 1
+    var index = 0
+    while index < destComponents.count, index < baseComponents.count,
+      destComponents[index] == baseComponents[index] {
+      index += 1
     }
-    
-    return i
-    
+
+    return index
+
     // Build relative path:
     //    var relComponents = Array(repeating: "..", count: baseComponents.count - i)
     //    relComponents.append(contentsOf: destComponents[i...])
     //    return relComponents.joined(separator: "/")
   }
-  
-  static func temporaryDirectory () -> URL {
+
+  static func temporaryDirectory() -> URL {
     return URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
   }
 }
-public struct NotImplementedError : Error {
-  
-}
 
-public struct BuilderProgress {
-  
-}
+public struct NotImplementedError: Error {}
+
+public struct BuilderProgress {}
 
 protocol SiteConfigurationProtocol {
-  var context : [String : Any] { get }
+  var context: [String: Any] { get }
 }
 
-struct SiteConfiguration : SiteConfigurationProtocol {
-  let context: [String : Any]
+struct SiteConfiguration: SiteConfigurationProtocol {
+  let context: [String: Any]
 }
 
-
-struct Stylesheet : StylesheetProtocol {
-  let baseUrl : URL
-  let url : URL
+struct Stylesheet: StylesheetProtocol {
+  let baseUrl: URL
+  let url: URL
   var relativePath: String {
     guard let index = url.pathComponentIndex(commonWith: self.baseUrl) else {
       return url.absoluteString
-      
     }
-    
+
     return url.pathComponents[index...].joined(separator: "/")
   }
-  
+
   var name: String {
     return url.deletingPathExtension().lastPathComponent
   }
+
   func contents() throws -> String {
-    return try String(contentsOf: self.url)
+    return try String(contentsOf: url)
   }
-}
-struct Include : IncludeProtocol {
-  let baseUrl : URL
-  let url : URL
-  var relativePath: String {
-    guard let index = url.pathComponentIndex(commonWith: self.baseUrl) else {
-      return url.absoluteString
-      
-    }
-    
-    return url.pathComponents[index...].joined(separator: "/")
-  }
-  
-  var name: String {
-    return url.deletingPathExtension().lastPathComponent
-  }
-  func contents() throws -> String {
-    return try String(contentsOf: self.url)
-  }
-  
 }
 
-struct Layout : LayoutProtocol {
-  let baseUrl : URL
-  let url : URL
+struct Include: IncludeProtocol {
+  let baseUrl: URL
+  let url: URL
   var relativePath: String {
     guard let index = url.pathComponentIndex(commonWith: self.baseUrl) else {
       return url.absoluteString
-      
     }
-    
+
     return url.pathComponents[index...].joined(separator: "/")
   }
-  
+
   var name: String {
     return url.deletingPathExtension().lastPathComponent
   }
+
   func contents() throws -> String {
-    return try String(contentsOf: self.url)
+    return try String(contentsOf: url)
   }
 }
+
+struct Layout: LayoutProtocol {
+  let baseUrl: URL
+  let url: URL
+  var relativePath: String {
+    guard let index = url.pathComponentIndex(commonWith: self.baseUrl) else {
+      return url.absoluteString
+    }
+
+    return url.pathComponents[index...].joined(separator: "/")
+  }
+
+  var name: String {
+    return url.deletingPathExtension().lastPathComponent
+  }
+
+  func contents() throws -> String {
+    return try String(contentsOf: url)
+  }
+}
+
 protocol SiteFileBuilderProtocol {
   mutating func add(_ type: SiteFileType, for url: URL)
-  var site : SiteDetailsProtocol { get }
+  var site: SiteDetailsProtocol { get }
 }
+
 enum SiteFileType {
   case layout, content, stylesheet, configuration, include
 }
-struct SiteFileBuilder : SiteFileBuilderProtocol  {
-  let baseUrl : URL
-  var files = [SiteFileType : [URL]]()
+
+struct SiteFileBuilder: SiteFileBuilderProtocol {
+  let baseUrl: URL
+  var files = [SiteFileType: [URL]]()
   var site: SiteDetailsProtocol {
     SiteDetails(
       stylesheets: files[.stylesheet]?.map(self.stylesheet(_:)) ?? [StylesheetProtocol](),
       content: files[.content]?.map(self.content(_:)) ?? [ContentProtocol](),
       includes: files[.include]?.map(self.include(_:)) ?? [IncludeProtocol](),
       layouts: files[.layout]?.map(self.layout(_:)) ?? [LayoutProtocol](),
-      configuration: self.configuration(files[.configuration]), baseUrl: self.baseUrl)
+      configuration: self.configuration(files[.configuration]), baseUrl: self.baseUrl
+    )
   }
-  
+
   mutating func add(_ type: SiteFileType, for url: URL) {
-    var list : [URL] = files[type] ?? [URL]()
+    var list: [URL] = files[type] ?? [URL]()
     list.append(url)
     files[type] = list
   }
-  
-  func content (_ url: URL) -> ContentProtocol {
-    return Content(baseUrl: self.baseUrl, url: url)
+
+  func content(_ url: URL) -> ContentProtocol {
+    return Content(baseUrl: baseUrl, url: url)
   }
-  
-  func include (_ url: URL) -> IncludeProtocol {
-    return Include(baseUrl: self.baseUrl, url: url)
+
+  func include(_ url: URL) -> IncludeProtocol {
+    return Include(baseUrl: baseUrl, url: url)
   }
-  
-  func layout (_ url: URL) -> LayoutProtocol {
-    return Layout(baseUrl: self.baseUrl, url: url)
+
+  func layout(_ url: URL) -> LayoutProtocol {
+    return Layout(baseUrl: baseUrl, url: url)
   }
-  
-  func stylesheet (_ url: URL) -> StylesheetProtocol {
-    return Stylesheet(baseUrl: self.baseUrl, url: url)
+
+  func stylesheet(_ url: URL) -> StylesheetProtocol {
+    return Stylesheet(baseUrl: baseUrl, url: url)
   }
-  
-  func configuration (_ urls: [URL]?) -> SiteConfigurationProtocol {
+
+  func configuration(_ urls: [URL]?) -> SiteConfigurationProtocol {
     guard let urls = urls else {
-      return SiteConfiguration(context: [String : Any]())
+      return SiteConfiguration(context: [String: Any]())
     }
-    let context = urls.compactMap{
+    let context = urls.compactMap {
       try? String(contentsOf: $0)
-    }.compactMap{
-      try? Yams.load(yaml: $0) as? [String : Any]
-    }.reduce([String : Any](), Dictionary.merging)
+    }.compactMap {
+      try? Yams.load(yaml: $0) as? [String: Any]
+    }.reduce([String: Any](), Dictionary.merging)
     return SiteConfiguration(context: context)
   }
 }
 
 extension Dictionary {
-  static func merging (_ lhs: Self, _ rhs: Self) -> Self {
-    return lhs.merging(rhs, uniquingKeysWith: {lhs,_ in lhs})
+  static func merging(_ lhs: Self, _ rhs: Self) -> Self {
+    return lhs.merging(rhs, uniquingKeysWith: { lhs, _ in lhs })
   }
 }
-struct Content : ContentProtocol {
-  let baseUrl : URL
-  let url : URL
+
+struct Content: ContentProtocol {
+  let baseUrl: URL
+  let url: URL
   var relativePath: String {
     guard let index = url.pathComponentIndex(commonWith: self.baseUrl) else {
       return url.absoluteString
-      
     }
-    
+
     return url.pathComponents[index...].joined(separator: "/")
   }
-  
+
   func contents() throws -> String {
-    return try String(contentsOf: self.url)
+    return try String(contentsOf: url)
   }
-  
+
   var isPost: Bool {
     url.deletingLastPathComponent().lastPathComponent == "_posts"
   }
-  
+
   var isMarkdown: Bool {
     url.pathExtension == "md"
   }
-  
+
   var name: String {
     return url.deletingPathExtension().lastPathComponent
   }
 }
+
 protocol StylesheetProtocol {
   func contents() throws -> String
   var relativePath: String { get }
 }
+
 protocol SiteDetailsProtocol {
-  var stylesheets : [StylesheetProtocol] { get }
-  var content : [ContentProtocol] { get }
-  var includes : [IncludeProtocol] { get }
-  var layouts : [LayoutProtocol] { get }
-  var configuration : SiteConfigurationProtocol { get }
-  var baseUrl : URL { get }
+  var stylesheets: [StylesheetProtocol] { get }
+  var content: [ContentProtocol] { get }
+  var includes: [IncludeProtocol] { get }
+  var layouts: [LayoutProtocol] { get }
+  var configuration: SiteConfigurationProtocol { get }
+  var baseUrl: URL { get }
 }
-struct SiteDetails : SiteDetailsProtocol {
-  
+
+struct SiteDetails: SiteDetailsProtocol {
   let stylesheets: [StylesheetProtocol]
   let content: [ContentProtocol]
-  
+
   let includes: [IncludeProtocol]
-  
+
   let layouts: [LayoutProtocol]
-  
+
   let configuration: SiteConfigurationProtocol
-  
+
   let baseUrl: URL
-  
-  
 }
+
 struct SiteDetailsEnumerator {
   func details(fromSourceUrl sourceDirectoryUrl: URL) throws -> SiteDetailsProtocol {
     var builder = SiteFileBuilder(baseUrl: sourceDirectoryUrl)
-    
+
     guard let enumerator = FileManager.default.enumerator(at: sourceDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey]) else {
       throw NotImplementedError()
     }
@@ -307,13 +285,13 @@ struct SiteDetailsEnumerator {
         continue
       }
       guard let index = url.pathComponentIndex(commonWith: sourceDirectoryUrl) else {
-        //print(url.pathComponents[index])
+        // print(url.pathComponents[index])
         continue
       }
       let paths = url.pathComponents[index...]
-      
+
       if paths.first == "_layouts" {
-        if url.pathExtension == "html"  {
+        if url.pathExtension == "html" {
           builder.add(.layout, for: url)
         }
       } else if paths.first == "_posts" {
@@ -333,7 +311,6 @@ struct SiteDetailsEnumerator {
           builder.add(.content, for: url)
         }
       }
-      
     }
     return builder.site
   }
@@ -344,51 +321,40 @@ enum ContentType {
 }
 
 public struct Builder {
-  
-  public init () {
-    
-  }
-  public func build (fromSourceDirectory sourceURL: URL, toDestinationDirectory destinationURL: URL, _ progress: (BuilderProgress) -> Void, completed: (Error?) -> Void) {
-    
+  public init() {}
+
+  public func build(fromSourceDirectory sourceURL: URL, toDestinationDirectory destinationURL: URL, _: (BuilderProgress) -> Void, completed: (Error?) -> Void) {
     let enumerator = SiteDetailsEnumerator()
-    let site : SiteDetailsProtocol
+    let site: SiteDetailsProtocol
     do {
       site = try enumerator.details(fromSourceUrl: sourceURL)
-    } catch let error {
+    } catch {
       return completed(error)
-      
     }
-    
+
     let environment = Environment(loader: FileSystemLoader(paths: [Path(site.baseUrl.path)]), extensions: nil)
-    
-    
-    //let includes : [String : Any]
-    let content : [(String, String)]
-    
-    let stylesheets : [(String, String)]
+
+    // let includes : [String : Any]
+    let content: [(String, String)]
+
+    let stylesheets: [(String, String)]
 //    includes = [String : [IncludeProtocol]](grouping: site.includes, by: {
 //      $0.name
 //    }).compactMapValues{
 //      $0.compactMap{ try? $0.contents() }.first
 //    }
-    
-    
 
-    let layouts  : [String : Any]
-    
-    
-      layouts = [ String: [LayoutProtocol]](grouping: site.layouts, by: {
-        $0.name
-      }).compactMapValues{
-        $0.compactMap{ try? $0.contents() }.first
-      }
-    
-    
-    
-    
+    let layouts: [String: Any]
+
+    layouts = [String: [LayoutProtocol]](grouping: site.layouts, by: {
+      $0.name
+    }).compactMapValues {
+      $0.compactMap { try? $0.contents() }.first
+    }
+
     let minues = Minues()
-    let allContent = site.content.compactMap{
-      (file) -> [String : Any]? in
+    let allContent = site.content.compactMap {
+      (file) -> [String: Any]? in
       guard let text = try? file.contents() else {
         return nil
       }
@@ -396,34 +362,33 @@ public struct Builder {
         return nil
       }
       let (pageAny, _) = components
-      
-      guard var page = pageAny as? [String : Any] else {
+
+      guard var page = pageAny as? [String: Any] else {
         return nil
       }
-      
+
       if let dateAny = page["date"] {
         guard let date = dateAny as? Date else {
           return nil
         }
-        
+
         guard date < Date() else {
           return nil
         }
       }
-      
+
       page["url"] = file.name == "index" ? "index.html" : [file.name, "index.html"].joined(separator: "/")
       page["isPost"] = file.isPost
-      
+
       return page
     }.sorted(by: { (lhs, rhs) -> Bool in
-      let lhsDate = lhs["date"].flatMap{ $0 as? Date } ?? Date.distantPast
-      let rhsDate = rhs["date"].flatMap{ $0 as? Date } ?? Date.distantPast
+      let lhsDate = lhs["date"].flatMap { $0 as? Date } ?? Date.distantPast
+      let rhsDate = rhs["date"].flatMap { $0 as? Date } ?? Date.distantPast
       return lhsDate > rhsDate
     })
-    
-    let contentDictionary = Dictionary<ContentType, [[String : Any]]>(grouping: allContent, by: { ($0["isPost"] as? Bool ?? false)  ? .post : .page})
-    
-    
+
+    let contentDictionary = [ContentType: [[String: Any]]](grouping: allContent, by: { ($0["isPost"] as? Bool ?? false) ? .post : .page })
+
     content = site.content.compactMap { (file) -> (String, String)? in
       print(file.name)
       guard let text = try? file.contents() else {
@@ -433,16 +398,15 @@ public struct Builder {
         return nil
       }
       let (pageAny, str) = components
-      let htmlRendered : String?
+      let htmlRendered: String?
       if file.isMarkdown {
-        
         let down = Down(markdownString: str)
         htmlRendered = try? down.toHTML()
       } else {
         htmlRendered = str
       }
-      
-      guard let page = pageAny as? [String : Any] else {
+
+      guard let page = pageAny as? [String: Any] else {
         return nil
       }
       guard let html = htmlRendered else {
@@ -452,59 +416,57 @@ public struct Builder {
         return nil
       }
       let path = file.name == "index" ? "index.html" : [file.name, "index.html"].joined(separator: "/")
-      var context : [String : Any] = ["site" : site.configuration.context, "page" : page, "posts" : contentDictionary[.post], "pages" : contentDictionary[.page]]
+      var context: [String: Any] = ["site": site.configuration.context, "page": page, "posts": contentDictionary[.post], "pages": contentDictionary[.page]]
       guard let contentHtml = try? environment.renderTemplate(string: html, context: context) else {
         return nil
       }
       context["content"] = contentHtml
-      
+
       guard let layout = layouts[layoutName] as? String else {
         return nil
       }
       do {
         return (path, try environment.renderTemplate(string: layout, context: context))
-      } catch let error {
+      } catch {
         debugPrint(error)
         return nil
       }
     }
-    
-    stylesheets = site.stylesheets.compactMap({ (stylesheet) in
-      return (try? stylesheet.contents()).map{ (stylesheet.relativePath, $0)}
-    })
-    
-    for (pathComponent, text) in (content + stylesheets) {
+
+    stylesheets = site.stylesheets.compactMap { stylesheet in
+      (try? stylesheet.contents()).map { (stylesheet.relativePath, $0) }
+    }
+
+    for (pathComponent, text) in content + stylesheets {
       let fileUrl = destinationURL.appendingPathComponent(pathComponent)
       let directoryUrl = fileUrl.deletingLastPathComponent()
-      
+
       do {
         try FileManager.default.createDirectory(at: directoryUrl, withIntermediateDirectories: true, attributes: nil)
         try text.write(to: fileUrl, atomically: false, encoding: .utf8)
-      } catch let error {
+      } catch {
         return completed(error)
       }
     }
-    
+
     print(destinationURL)
     completed(nil)
   }
-  
-  
 }
 
 public struct Minues {
-  public init () {
-    
-  }
-  public func yaml(fromURL url: URL) throws -> [String : Any] {
+  public init() {}
+
+  public func yaml(fromURL url: URL) throws -> [String: Any] {
     let text = try String(contentsOf: url)
-    
-    guard let yaml = try Yams.load(yaml: text) as? [String : Any] else {
+
+    guard let yaml = try Yams.load(yaml: text) as? [String: Any] else {
       throw NoDataError()
     }
     return yaml
   }
-  public func run (fromString encodedYAML: String) throws -> String {
+
+  public func run(fromString _: String) throws -> String {
     //    let components = try componentsFromMarkdown(encodedYAML)
     //    if let dictionary = components.frontMatter as? [String : Any] {
     //      let template = Template(templateString: try components.markdown.toHTML())
@@ -514,35 +476,34 @@ public struct Minues {
     //    }
     throw NotImplementedError()
   }
-  
-  public func run (fromEntry entry: Entry) throws -> String {
-    //let down = Down(markdownString: entry.markdown)
-    //let template = Template(templateString: try down.toHTML())
-    //return try template.render(entry.frontMatter.dictionary)
+
+  public func run(fromEntry _: Entry) throws -> String {
+    // let down = Down(markdownString: entry.markdown)
+    // let template = Template(templateString: try down.toHTML())
+    // return try template.render(entry.frontMatter.dictionary)
     throw NotImplementedError()
   }
-  
-  public func setupSite(_ site: Site, withTheme theme: Theme, _ completed : @escaping (Error?) -> Void) {
+
+  public func setupSite(_ site: Site, withTheme theme: Theme, _ completed: @escaping (Error?) -> Void) {
     let siteDirectoryUrl = site.documentsURL
     let themeDirectoryUrl = theme.directoryURL
-    var isDirectory : ObjCBool = false
+    var isDirectory: ObjCBool = false
     let isExists = FileManager.default.fileExists(atPath: siteDirectoryUrl.path, isDirectory: &isDirectory)
-    if isExists && !isDirectory.boolValue {
+    if isExists, !isDirectory.boolValue {
       try? FileManager.default.removeItem(at: siteDirectoryUrl)
     }
-    
+
     try? FileManager.default.createDirectory(at: Directories.shared.sitesDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
     try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
     print(siteDirectoryUrl)
-    
-  
+
     let postsUrl = siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true)
-    _ = Generator.generate(100, markdownFilesAt: postsUrl) { (result) in
+    _ = Generator.generate(100, markdownFilesAt: postsUrl) { result in
       completed(result.error)
     }
   }
-  
-  fileprivate func componentsFromMarkdown(_ text: String) throws -> (frontMatter : Any?, content: String) {
+
+  fileprivate func componentsFromMarkdown(_ text: String) throws -> (frontMatter: Any?, content: String) {
     let result = text =~ "^-{3}\n([\\s\\S]*?)\n-{3}\n"
     let ranges = result.first
     let totalRange = ranges?.first
@@ -551,13 +512,12 @@ public struct Minues {
       let frontMatter = text[fmRange]
       let yaml = try Yams.load(yaml: String(frontMatter))
       let content = text[totalRange.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)
-      //let down = Down(markdownString: String(content))
-      
+      // let down = Down(markdownString: String(content))
+
       return (frontMatter: yaml, content: content)
-      
+
     } else {
       return (frontMatter: nil, content: text)
-      
     }
   }
 }

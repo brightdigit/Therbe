@@ -1,0 +1,5 @@
+included: 
+  - minues-ios-app 
+  - ../Minues/Sources
+type_name:
+  allowed_symbols: _

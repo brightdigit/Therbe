@@ -1,12 +1,9 @@
-//
-//  File.swift
-//  
-//
-//  Created by Leo Dion on 7/22/19.
-//
+// Result.swift
+// Copyright (c) 2019 BrightDigit
+// Created by Leo Dion on 7/31/19.
 
 import Foundation
-extension Result {
+public extension Result {
   init(value: Success?, error: Failure?, noDataError: Failure) {
     if let error = error {
       self = .failure(error)
@@ -14,6 +11,14 @@ extension Result {
       self = .success(value)
     } else {
       self = .failure(noDataError)
+    }
+  }
+
+  var error: Error? {
+    if case let .failure(error) = self {
+      return error
+    } else {
+      return nil
     }
   }
 }

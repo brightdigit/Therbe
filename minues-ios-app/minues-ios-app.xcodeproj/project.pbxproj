@@ -103,6 +103,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B33E950C22E61EF900AA9939 /* Build configuration list for PBXNativeTarget "minues-ios-app" */;
 			buildPhases = (
+				B3CEFBD822F1CBD400856CDD /* swiftformat */,
+				B3CEFBD922F1CBE300856CDD /* swiftlint */,
 				B33E94F422E61EF400AA9939 /* Sources */,
 				B33E94F522E61EF400AA9939 /* Frameworks */,
 				B33E94F622E61EF400AA9939 /* Resources */,
@@ -164,6 +166,45 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B3CEFBD822F1CBD400856CDD /* swiftformat */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = swiftformat;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif which swiftformat >/dev/null; then\n  swiftformat minues-ios-app ../Minues/Sources --swiftversion 5\nelse\n  echo \"warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat\"\nfi\n";
+		};
+		B3CEFBD922F1CBE300856CDD /* swiftlint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = swiftlint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B33E94F422E61EF400AA9939 /* Sources */ = {

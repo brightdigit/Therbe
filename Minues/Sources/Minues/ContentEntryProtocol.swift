@@ -9,6 +9,12 @@ public protocol ContentEntryProtocol {
   var url: URL { get }
 }
 
+extension ContentEntryProtocol {
+  func save(atomically: Bool = false, encoding: String.Encoding = .utf8) throws {
+    try text.write(to: url, atomically: atomically, encoding: encoding)
+  }
+}
+
 public struct ContentEntry: ContentEntryProtocol {
   public let frontMatter: FrontMatter
   public let content: String

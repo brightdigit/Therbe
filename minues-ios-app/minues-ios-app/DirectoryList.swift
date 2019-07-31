@@ -24,7 +24,7 @@ struct DirectoryList: View {
     return true
   }
 
-  @State var generator: Generator?
+  @State var generator: DeprecatedPostCollectionGenerator?
   var isGenerating: Any? {
     generator.flatMap { self.result == nil ? $0 : nil }
   }
@@ -130,7 +130,7 @@ struct DirectoryList: View {
 //        }
 //      }
 //    }
-  //
+//
 //  }
 
   var emptyText: some View {

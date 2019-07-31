@@ -72,7 +72,7 @@ struct SiteDetails: View {
     })
   }
 
-  fileprivate func setupSite(_ site: Site, withTheme theme: Theme, _ completed: @escaping (Error?) -> Void) {
+  fileprivate func setupSite(_ site: Site, withTheme theme: Theme, _: @escaping (Error?) -> Void) {
     let siteDirectoryUrl = site.documentsURL
     let themeDirectoryUrl = theme.directoryURL
     var isDirectory: ObjCBool = false
@@ -84,8 +84,11 @@ struct SiteDetails: View {
     try? FileManager.default.createDirectory(at: Directories.shared.sitesDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
     try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
     print(siteDirectoryUrl)
-    let postsUrl = siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true)
-    _ = Generator.generate(100, markdownFilesAt: postsUrl) { result in
+    let provider = PostCollectionProvider()
+    let generator = DownloadGenerator(destinationUrl: siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true))
+    let task = provider.generate(100, using: generator)
+
+    // _ = DeprecatedPostCollectionGenerator.generate(100, markdownFilesAt: postsUrl) { result in
 //      let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
 //        (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
 //      }
@@ -104,15 +107,14 @@ struct SiteDetails: View {
 //        return nil
 //      })
 
-      completed(result.error)
+    // completed(result.error)
 //        Result {
 //                guard let items = items else {
 //                  throw NoDocumentDirectoryError()
 //                }
 //                return items
 //              }
-      // )
-    }
+    // )
   }
 
   func beginLoading() {

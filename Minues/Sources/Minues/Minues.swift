@@ -419,7 +419,7 @@ public struct Minues {
     copyTheme(theme, forSite: site)
 
     let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
-    _ = Generator.generate(100, markdownFilesAt: postsUrl) { result in
+    _ = DeprecatedPostCollectionGenerator.generate(100, markdownFilesAt: postsUrl) { result in
       completed(result.error)
     }
   }

@@ -38,3 +38,9 @@ protocol ContentProtocol {
   func contents() throws -> String
   var isMarkdown: Bool { get }
 }
+
+@available(*, deprecated, renamed: "FileProtocol")
+protocol StylesheetProtocol {
+  func contents() throws -> String
+  var relativePath: String { get }
+}

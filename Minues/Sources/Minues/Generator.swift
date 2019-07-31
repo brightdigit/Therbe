@@ -4,33 +4,9 @@
 
 import Foundation
 
-struct MissingTitleError: Error {}
-struct NoDataError: Error {}
-
 extension Array: Error where Element == Error {}
 
 public typealias ResultList<Element> = Result<[Element], [Error]>
-
-class ResultListBuilder<Element> {
-  var successes = [Element]()
-  var failures = [Error]()
-
-  func append(_ element: Element) {
-    successes.append(element)
-  }
-
-  func append(_ error: Error) {
-    failures.append(error)
-  }
-
-  var result: ResultList<Element> {
-    if failures.count > 0 {
-      return .failure(failures)
-    } else {
-      return .success(successes)
-    }
-  }
-}
 
 public class Generator {
   let destinationURL: URL

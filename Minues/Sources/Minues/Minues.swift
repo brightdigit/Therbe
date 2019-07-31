@@ -8,83 +8,6 @@ import PathKit
 import Stencil
 import Yams
 
-struct NoDocumentDirectoryError: Error {}
-
-public struct Site {
-  public let title: String
-  public let logoUrl: URL
-  public let id: UUID
-  public let domainName: String
-
-  public var documentsURL: URL {
-    return Directories.shared.sitesDirectoryUrl.appendingPathComponent(id.uuidString)
-  }
-
-  #if DEBUG
-
-    public init(title: String, photoId: Int? = nil, id: UUID? = nil, domainName _: String? = nil) {
-      self.title = title
-      self.id = id ?? UUID()
-      let photoId = photoId ?? Int.random(in: 1 ... 1000)
-      logoUrl = URL(string: .init(format: "https://picsum.photos/id/%d/%d/%d", photoId, 1024, 1024))!
-      domainName = title.filter {
-        !$0.isWhitespace && !$0.isNewline
-      }.lowercased() + ".com"
-    }
-  #endif
-}
-
-public struct Theme: Hashable {
-  public let title: String
-  public let directoryURL: URL
-
-  public init?(configURL: URL) {
-    let minues = Minues()
-    guard let config = try? minues.yaml(fromURL: configURL) else {
-      return nil
-    }
-
-    guard let title = config["title"] as? String else {
-      return nil
-    }
-    self.title = title
-    directoryURL = configURL.deletingLastPathComponent()
-  }
-}
-
-public extension URL {
-  func pathComponentIndex(commonWith base: URL) -> Int? {
-    // Ensure that both URLs represent files:
-    guard isFileURL, base.isFileURL else {
-      return nil
-    }
-
-    // Remove/replace "." and "..", make paths absolute:
-    let destComponents = standardized.pathComponents
-    let baseComponents = base.standardized.pathComponents
-
-    // Find number of common path components:
-    var index = 0
-    while index < destComponents.count, index < baseComponents.count,
-      destComponents[index] == baseComponents[index] {
-      index += 1
-    }
-
-    return index
-
-    // Build relative path:
-    //    var relComponents = Array(repeating: "..", count: baseComponents.count - i)
-    //    relComponents.append(contentsOf: destComponents[i...])
-    //    return relComponents.joined(separator: "/")
-  }
-
-  static func temporaryDirectory() -> URL {
-    return URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-  }
-}
-
-public struct NotImplementedError: Error {}
-
 public struct BuilderProgress {}
 
 protocol SiteConfigurationProtocol {
@@ -244,11 +167,6 @@ struct Content: ContentProtocol {
   var name: String {
     return url.deletingPathExtension().lastPathComponent
   }
-}
-
-protocol StylesheetProtocol {
-  func contents() throws -> String
-  var relativePath: String { get }
 }
 
 protocol SiteDetailsProtocol {

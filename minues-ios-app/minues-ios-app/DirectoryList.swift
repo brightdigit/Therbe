@@ -24,7 +24,7 @@ struct DirectoryList: View {
     return true
   }
 
-  @State var generator: DeprecatedPostCollectionGenerator?
+  @State var generator: Any?
   var isGenerating: Any? {
     generator.flatMap { self.result == nil ? $0 : nil }
   }

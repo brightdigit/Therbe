@@ -15,15 +15,16 @@ struct NewSiteView: View {
   var readyForBuild : Bool {
     return !(siteTitle.isEmpty)
   }
+  @State var siteBuiling = false
   @State var siteTitle : String = ""
   @State var pickedThemeIndex = 0
   @State var themes : Result<[Theme], Error>?
   let loadingDirectoryUrl : URL = Bundle.main.url(forResource: "themes", withExtension: nil)!
   var body: some View {
     ZStack{
-      busyView.onAppear(perform: self.beginLoad)
-      errorView
       inputView
+      errorView
+      busyView.onAppear(perform: self.beginLoad)
     }
     
   }
@@ -42,7 +43,7 @@ struct NewSiteView: View {
   }
   
   var busyView : some View {
-    let loading : Void? = self.themes == nil ? Void() : nil
+    let loading : Void? = (self.themes == nil || self.siteBuiling) ? Void() : nil
     return loading.map {
       ActivitiyIndicatorView(style: .large)
     }
@@ -77,6 +78,7 @@ struct NewSiteView: View {
   }
   
   func beginBuild () {
+    self.siteBuiling = true
     let minues = Minues()
     
     let chosenTheme =  self.themes.flatMap{ try? $0.get() }.flatMap{ $0[self.pickedThemeIndex] }
@@ -100,7 +102,7 @@ struct NewSiteView: View {
   }
   
   func onCompleted (_ error: Error?) {
-    
+    self.siteBuiling = false
   }
   
   var errorView : some View {

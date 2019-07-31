@@ -73,6 +73,10 @@ public struct HeaderPhotoContentEntryFactory: ContentEntryFactoryProtocol {
 }
 
 public class DownloadGenerationTask: PostGenerationTaskProtocol {
+  public func resume() {
+    task.resume()
+  }
+
   public typealias Callback = (Result<ContentEntryProtocol, Error>) -> Void
   typealias ContentEntryResult = Result<ContentEntryProtocol, Error>
   var callbacks = [Callback]()
@@ -150,11 +154,15 @@ public struct DownloadGenerator: PostGeneratorProtocol {
   }
 }
 
-public struct ContentEntryCollectionProgress {}
+public enum ContentEntryCollectionProgress {
+  case progress(Float)
+  case message(String)
+}
 
 public protocol PostCollectionTaskProtocol {
-  mutating func completion(_ completion: (Result<ContentEntryProtocol, Error>) -> Void)
-  mutating func progress(_ progress: (Result<ContentEntryCollectionProgress, Error>) -> Void)
+  mutating func completion(_ completion: @escaping (ResultList<ContentEntryProtocol>) -> Void)
+  mutating func progress(_ progress: @escaping (Result<ContentEntryCollectionProgress, Error>) -> Void)
+  func resume()
 }
 
 public protocol PostCollectionProviderProtocol {
@@ -167,23 +175,67 @@ public protocol PostGeneratorProtocol {
 
 public protocol PostGenerationTaskProtocol {
   mutating func completion(_ completion: @escaping (Result<ContentEntryProtocol, Error>) -> Void)
+  func resume()
 }
 
-public struct PostCollectionTask: PostCollectionTaskProtocol {
-  public func completion(_: (Result<ContentEntryProtocol, Error>) -> Void) {}
+public class PostCollectionTask: PostCollectionTaskProtocol {
+  var completions = [(ResultList<ContentEntryProtocol>) -> Void]()
+  var progresses = [(Result<ContentEntryCollectionProgress, Error>) -> Void]()
 
-  public func progress(_: (Result<ContentEntryCollectionProgress, Error>) -> Void) {}
+  var result: ResultList<ContentEntryProtocol>? {
+    didSet {
+      result.map(report(result:))
+    }
+  }
 
-  let tasks: [PostGenerationTaskProtocol]
+  func report(result: ResultList<ContentEntryProtocol>) {
+    completions.forEach { $0(result) }
+  }
+
+  public func completion(_ callback: @escaping (ResultList<ContentEntryProtocol>) -> Void) {
+    completions.append(callback)
+    result.map(callback)
+  }
+
+  public func progress(_ callback: @escaping (Result<ContentEntryCollectionProgress, Error>) -> Void) {
+    progresses.append(callback)
+  }
+
+  let builder = ResultListBuilder<ContentEntryProtocol>()
+  private var tasks = [PostGenerationTaskProtocol]()
+
+  func append(_ task: PostGenerationTaskProtocol) {
+    assert(builder.count == 0, "Cannot add tasks after operation has started.")
+    var newTask = task
+    newTask.completion(taskCompleted)
+    tasks.append(newTask)
+  }
+
+  func taskCompleted(_ result: Result<ContentEntryProtocol, Error>) {
+    let percent = Float(builder.count) / Float(tasks.count)
+    let progress = result.map { _ in ContentEntryCollectionProgress.progress(percent) }
+    progresses.forEach { $0(progress) }
+    builder.append(result)
+    print(percent)
+    if builder.count >= tasks.count {
+      self.result = builder.result
+    }
+  }
+
+  public func resume() {
+    tasks.forEach { $0.resume() }
+  }
 }
 
 public struct PostCollectionProvider: PostCollectionProviderProtocol {
   public init() {}
   public func generate(_ count: Int, using generator: PostGeneratorProtocol) -> PostCollectionTaskProtocol {
-    let tasks = (1 ... count).map { _ in
-      generator.next()
+    let collection = PostCollectionTask()
+    (1 ... count).forEach { _ in
+      collection.append(generator.next())
     }
-    return PostCollectionTask(tasks: tasks)
+
+    return collection
   }
 }
 

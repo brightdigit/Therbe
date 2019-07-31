@@ -419,9 +419,16 @@ public struct Minues {
     copyTheme(theme, forSite: site)
 
     let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
-    _ = DeprecatedPostCollectionGenerator.generate(100, markdownFilesAt: postsUrl) { result in
+    let provider = PostCollectionProvider()
+    let generator = DownloadGenerator(destinationUrl: postsUrl)
+    var task = provider.generate(100, using: generator)
+    task.completion { result in
       completed(result.error)
     }
+    task.resume()
+//    _ = DeprecatedPostCollectionGenerator.generate(100, markdownFilesAt: postsUrl) { result in
+//
+//    }
   }
 
   fileprivate func componentsFromMarkdown(_ text: String) throws -> (frontMatter: Any?, content: String) {

@@ -23,4 +23,17 @@ class ResultListBuilder<Element> {
       return .success(successes)
     }
   }
+
+  var count: Int {
+    return successes.count + failures.count
+  }
+}
+
+extension ResultListBuilder {
+  func append(_ result: Result<Element, Error>) {
+    switch result {
+    case let .success(element): append(element)
+    case let .failure(error): append(error)
+    }
+  }
 }

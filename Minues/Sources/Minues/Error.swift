@@ -13,4 +13,6 @@ struct MissingTitleError: Error {}
 @available(*, deprecated, renamed: "MinuesError")
 struct NoDataError: Error {}
 
-public enum MinuesError {}
+public enum MinuesError: Error {
+  case invalidState
+}

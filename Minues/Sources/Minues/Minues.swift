@@ -9,7 +9,7 @@ struct NoDocumentDirectoryError : Error {}
 
 
 public extension Result {
-  public var error : Error? {
+  var error : Error? {
     if case let .failure(error) = self {
       return error
     } else {
@@ -24,9 +24,9 @@ public struct Directories {
   public let sitesDirectoryUrl : URL
   init (fromUrlFor searchPath: FileManager.SearchPathDirectory? = .documentDirectory, in domainMask: FileManager.SearchPathDomainMask = .userDomainMask) throws {
     let documentDirectoryUrls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-          guard let documentDirURL = documentDirectoryUrls.first else {
-            throw NoDocumentDirectoryError()
-          }
+    guard let documentDirURL = documentDirectoryUrls.first else {
+      throw NoDocumentDirectoryError()
+    }
     self.documentDirectoryUrl = documentDirURL
     self.sitesDirectoryUrl = self.documentDirectoryUrl.appendingPathComponent("sites", isDirectory: true)
   }
@@ -109,18 +109,6 @@ public struct NotImplementedError : Error {
   
 }
 
-
-@available(*, deprecated)
-struct RegexResult {
-  let isMatching: Bool
-  let matches: [String]
-  
-  init(results: [String]) {
-    matches = results
-    isMatching = matches.count > 0
-  }
-}
-
 public struct BuilderProgress {
   
 }
@@ -133,17 +121,6 @@ struct SiteConfiguration : SiteConfigurationProtocol {
   let context: [String : Any]
 }
 
-protocol LayoutProtocol {
-  var relativePath : String { get }
-  var name : String { get }
-  func contents() throws -> String
-}
-
-protocol IncludeProtocol {
-  var relativePath : String { get }
-  var name : String { get }
-  func contents() throws -> String
-}
 
 struct Stylesheet : StylesheetProtocol {
   let baseUrl : URL
@@ -216,7 +193,7 @@ struct SiteFileBuilder : SiteFileBuilderProtocol  {
   var files = [SiteFileType : [URL]]()
   var site: SiteDetailsProtocol {
     SiteDetails(
-    stylesheets: files[.stylesheet]?.map(self.stylesheet(_:)) ?? [StylesheetProtocol](),
+      stylesheets: files[.stylesheet]?.map(self.stylesheet(_:)) ?? [StylesheetProtocol](),
       content: files[.content]?.map(self.content(_:)) ?? [ContentProtocol](),
       includes: files[.include]?.map(self.include(_:)) ?? [IncludeProtocol](),
       layouts: files[.layout]?.map(self.layout(_:)) ?? [LayoutProtocol](),
@@ -240,7 +217,7 @@ struct SiteFileBuilder : SiteFileBuilderProtocol  {
   func layout (_ url: URL) -> LayoutProtocol {
     return Layout(baseUrl: self.baseUrl, url: url)
   }
-
+  
   func stylesheet (_ url: URL) -> StylesheetProtocol {
     return Stylesheet(baseUrl: self.baseUrl, url: url)
   }
@@ -262,15 +239,6 @@ extension Dictionary {
   static func merging (_ lhs: Self, _ rhs: Self) -> Self {
     return lhs.merging(rhs, uniquingKeysWith: {lhs,_ in lhs})
   }
-}
-protocol ContentProtocol {
-  
-  var relativePath : String { get }
-  
-  var name: String { get }
-  var isPost : Bool { get }
-  func contents() throws -> String
-  var isMarkdown : Bool  { get }
 }
 struct Content : ContentProtocol {
   let baseUrl : URL
@@ -394,31 +362,28 @@ public struct Builder {
     let environment = Environment(loader: FileSystemLoader(paths: [Path(site.baseUrl.path)]), extensions: nil)
     
     
-    let includes : [String : Any]
-    let layouts  : [String : Any]
+    //let includes : [String : Any]
     let content : [(String, String)]
     
     let stylesheets : [(String, String)]
-    includes = [String : [IncludeProtocol]](grouping: site.includes, by: {
-      $0.name
-    }).compactMapValues{
-      $0.compactMap{ try? $0.contents() }.first
-    }
+//    includes = [String : [IncludeProtocol]](grouping: site.includes, by: {
+//      $0.name
+//    }).compactMapValues{
+//      $0.compactMap{ try? $0.contents() }.first
+//    }
     
     
+
+    let layouts  : [String : Any]
     
-    do {
+    
       layouts = [ String: [LayoutProtocol]](grouping: site.layouts, by: {
         $0.name
       }).compactMapValues{
         $0.compactMap{ try? $0.contents() }.first
       }
-      
-    }
-      
-    catch let error {
-      return completed(error)
-    }
+    
+    
     
     
     let minues = Minues()
@@ -430,7 +395,7 @@ public struct Builder {
       guard let components = try? minues.componentsFromMarkdown(text) else {
         return nil
       }
-      let (pageAny, str) = components
+      let (pageAny, _) = components
       
       guard var page = pageAny as? [String : Any] else {
         return nil
@@ -455,6 +420,7 @@ public struct Builder {
       let rhsDate = rhs["date"].flatMap{ $0 as? Date } ?? Date.distantPast
       return lhsDate > rhsDate
     })
+    
     let contentDictionary = Dictionary<ContentType, [[String : Any]]>(grouping: allContent, by: { ($0["isPost"] as? Bool ?? false)  ? .post : .page})
     
     
@@ -557,47 +523,24 @@ public struct Minues {
   }
   
   public func setupSite(_ site: Site, withTheme theme: Theme, _ completed : @escaping (Error?) -> Void) {
-      let siteDirectoryUrl = site.documentsURL
-      let themeDirectoryUrl = theme.directoryURL
-      var isDirectory : ObjCBool = false
-      let isExists = FileManager.default.fileExists(atPath: siteDirectoryUrl.path, isDirectory: &isDirectory)
-      if isExists && !isDirectory.boolValue {
-        try? FileManager.default.removeItem(at: siteDirectoryUrl)
-      }
-      
-      try? FileManager.default.createDirectory(at: Directories.shared.sitesDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
-      try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
-      print(siteDirectoryUrl)
-      let postsUrl = siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true)
-      _ = Generator.generate(100, markdownFilesAt: postsUrl) { (result) in
-  //      let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{
-  //        (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true || ["html", "md", "markdown"].contains($0.pathExtension)
-  //      }
-  //      let items = urls?.compactMap({ (url) -> EntryProtocol? in
-  //        let isDirectory = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
-  //        if isDirectory {
-  //          let pages = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .init()).contains {
-  //            ["html", "md", "markdown"].contains($0.pathExtension)
-  //          }
-  //          if pages == true {
-  //            return BasicEntry(type: .folder, url: url)
-  //          }
-  //        } else {
-  //          return BasicEntry(type: .page, url: url)
-  //        }
-  //        return nil
-  //      })
-        
-        completed(result.error)
-  //        Result {
-  //                guard let items = items else {
-  //                  throw NoDocumentDirectoryError()
-  //                }
-  //                return items
-  //              }
-        //)
-      }
+    let siteDirectoryUrl = site.documentsURL
+    let themeDirectoryUrl = theme.directoryURL
+    var isDirectory : ObjCBool = false
+    let isExists = FileManager.default.fileExists(atPath: siteDirectoryUrl.path, isDirectory: &isDirectory)
+    if isExists && !isDirectory.boolValue {
+      try? FileManager.default.removeItem(at: siteDirectoryUrl)
     }
+    
+    try? FileManager.default.createDirectory(at: Directories.shared.sitesDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
+    try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
+    print(siteDirectoryUrl)
+    
+  
+    let postsUrl = siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true)
+    _ = Generator.generate(100, markdownFilesAt: postsUrl) { (result) in
+      completed(result.error)
+    }
+  }
   
   fileprivate func componentsFromMarkdown(_ text: String) throws -> (frontMatter : Any?, content: String) {
     let result = text =~ "^-{3}\n([\\s\\S]*?)\n-{3}\n"

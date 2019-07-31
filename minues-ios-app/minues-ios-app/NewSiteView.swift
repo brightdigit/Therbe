@@ -87,6 +87,10 @@ struct NewSiteView: View {
       return
     }
     let site = Site(title: self.siteTitle)
+
+    // copy theme template
+    // generate posts
+    //
     minues.setupSite(site, withTheme: theme) { (error) in
       if let error = error {
         return

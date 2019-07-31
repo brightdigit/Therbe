@@ -81,7 +81,8 @@ struct NewSiteView: View {
 
     // copy theme template
     // generate posts
-    //
+    // organize files into operations
+    // execute actions on file sets
     minues.setupSite(site, withTheme: theme) { error in
       if let error = error {
         return

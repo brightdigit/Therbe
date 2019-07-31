@@ -395,14 +395,14 @@ public struct Minues {
     throw NotImplementedError()
   }
 
-  public func run(fromEntry _: Entry) throws -> String {
+  public func run(fromEntry _: ContentEntryProtocol) throws -> String {
     // let down = Down(markdownString: entry.markdown)
     // let template = Template(templateString: try down.toHTML())
     // return try template.render(entry.frontMatter.dictionary)
     throw NotImplementedError()
   }
 
-  public func setupSite(_ site: Site, withTheme theme: Theme, _ completed: @escaping (Error?) -> Void) {
+  public func copyTheme(_ theme: Theme, forSite site: Site) {
     let siteDirectoryUrl = site.documentsURL
     let themeDirectoryUrl = theme.directoryURL
     var isDirectory: ObjCBool = false
@@ -413,9 +413,12 @@ public struct Minues {
 
     try? FileManager.default.createDirectory(at: Directories.shared.sitesDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
     try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
-    print(siteDirectoryUrl)
+  }
 
-    let postsUrl = siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true)
+  public func setupSite(_ site: Site, withTheme theme: Theme, _ completed: @escaping (Error?) -> Void) {
+    copyTheme(theme, forSite: site)
+
+    let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
     _ = Generator.generate(100, markdownFilesAt: postsUrl) { result in
       completed(result.error)
     }

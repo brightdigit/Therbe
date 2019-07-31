@@ -11,10 +11,10 @@ public typealias ResultList<Element> = Result<[Element], [Error]>
 public class Generator {
   let destinationURL: URL
   let count: Int
-  let callback: (ResultList<Entry>) -> Void
+  let callback: (ResultList<ContentEntryProtocol>) -> Void
   let group = DispatchGroup()
   var tasks: [URLSessionDownloadTask]!
-  let resultListBuilder = ResultListBuilder<Entry>()
+  let resultListBuilder = ResultListBuilder<ContentEntryProtocol>()
 
   let photoURLTemplate = "https://picsum.photos/id/%d/%d/%d"
   let markdownUrl = URL(string: "https://jaspervdj.be/lorem-markdownum/markdown.txt")!
@@ -38,7 +38,7 @@ public class Generator {
     return currentState ?? .suspended
   }
 
-  init(destinationURL: URL, count: Int, callback: @escaping (ResultList<Entry>) -> Void) {
+  init(destinationURL: URL, count: Int, callback: @escaping (ResultList<ContentEntryProtocol>) -> Void) {
     self.destinationURL = destinationURL
     self.count = count
     self.callback = callback
@@ -48,7 +48,7 @@ public class Generator {
     }
   }
 
-  public static func generate(_ count: Int, markdownFilesAt directoryURL: URL, _ completed: @escaping (ResultList<Entry>) -> Void) -> Generator {
+  public static func generate(_ count: Int, markdownFilesAt directoryURL: URL, _ completed: @escaping (ResultList<ContentEntryProtocol>) -> Void) -> Generator {
     let generator = Generator(destinationURL: directoryURL, count: count, callback: completed)
     generator.begin()
     return generator
@@ -74,7 +74,7 @@ public class Generator {
       }
     }
     let entryResult = stringResult.flatMap { markdown in
-      Result { () -> Entry in
+      Result { () -> ContentEntryProtocol in
         var foundTitle: String?
         var newMarkdown = markdown
         let results = markdown =~ "(#+)\\s(.+)"
@@ -105,7 +105,7 @@ public class Generator {
           categories: ["a", "b", "c"],
           coverImage: URL(string: String(format: photoURLTemplate, Int.random(in: 1 ... 1000), 1920, 960))!
         )
-        return Entry(frontMatter: frontMatter, content: newMarkdown, url: fileURL)
+        return ContentEntry(frontMatter: frontMatter, content: newMarkdown, url: fileURL)
       }
     }
     do {
@@ -117,8 +117,8 @@ public class Generator {
     group.leave()
   }
 
-  private static func write(_ entryResult: Result<Entry, Error>) throws -> Entry {
-    let entry: Entry
+  private static func write(_ entryResult: Result<ContentEntryProtocol, Error>) throws -> ContentEntryProtocol {
+    let entry: ContentEntryProtocol
     entry = try entryResult.get()
 
     try entry.text.write(to: entry.url, atomically: false, encoding: .utf8)

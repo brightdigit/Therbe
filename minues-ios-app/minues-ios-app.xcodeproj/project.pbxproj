@@ -18,6 +18,7 @@
 		B342268122E7E088002E76FE /* ActivitiyIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B342268022E7E088002E76FE /* ActivitiyIndicatorView.swift */; };
 		B38F0D2222E79F9A008E3D0A /* SiteList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38F0D2122E79F9A008E3D0A /* SiteList.swift */; };
 		B39E1B8A22F07062007B4D45 /* NewSiteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E1B8922F07062007B4D45 /* NewSiteView.swift */; };
+		B3BDA74922F32FD6009E8F27 /* NewPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BDA74822F32FD6009E8F27 /* NewPost.swift */; };
 		B3FC529022E73C1C00C14386 /* DirectoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3FC528F22E73C1C00C14386 /* DirectoryList.swift */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +37,7 @@
 		B342268022E7E088002E76FE /* ActivitiyIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitiyIndicatorView.swift; sourceTree = "<group>"; };
 		B38F0D2122E79F9A008E3D0A /* SiteList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteList.swift; sourceTree = "<group>"; };
 		B39E1B8922F07062007B4D45 /* NewSiteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSiteView.swift; sourceTree = "<group>"; };
+		B3BDA74822F32FD6009E8F27 /* NewPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NewPost.swift; path = "../../../../../../../../../../Users/leo/Documents/Projects/Minues/minues-ios-app/minues-ios-app/NewPost.swift"; sourceTree = "<group>"; };
 		B3FC528F22E73C1C00C14386 /* DirectoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -92,6 +94,7 @@
 				B342268022E7E088002E76FE /* ActivitiyIndicatorView.swift */,
 				B3349A3322EF4FA300F1F69D /* BuildView.swift */,
 				B39E1B8922F07062007B4D45 /* NewSiteView.swift */,
+				B3BDA74822F32FD6009E8F27 /* NewPost.swift */,
 			);
 			path = "minues-ios-app";
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 				B38F0D2222E79F9A008E3D0A /* SiteList.swift in Sources */,
 				B33E94FE22E61EF400AA9939 /* SceneDelegate.swift in Sources */,
 				B39E1B8A22F07062007B4D45 /* NewSiteView.swift in Sources */,
+				B3BDA74922F32FD6009E8F27 /* NewPost.swift in Sources */,
 				B3349A3422EF4FA300F1F69D /* BuildView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

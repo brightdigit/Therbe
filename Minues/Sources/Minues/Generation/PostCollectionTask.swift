@@ -1,6 +1,6 @@
-// Sources
+// PostCollectionTask.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 7/23/19.
+// Created by Leo Dion on 8/1/19.
 
 public class PostCollectionTask: PostCollectionTaskProtocol {
   var completions = [(ResultList<ContentEntryProtocol>) -> Void]()

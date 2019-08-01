@@ -1,6 +1,6 @@
-// minues-ios-app
+// SceneDelegate.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 7/23/19.
+// Created by Leo Dion on 8/1/19.
 
 import Minues
 import SwiftUI
@@ -15,7 +15,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
     if let windowScene = scene as? UIWindowScene {
       let window = UIWindow(windowScene: windowScene)
-      window.rootViewController = UIHostingController(rootView: SiteList(sites: [Site]()))
+      // window.rootViewController = UIHostingController(rootView: SiteList(sites: [Site]()))
+      window.rootViewController = UIHostingController(rootView: NewPost())
       self.window = window
       window.makeKeyAndVisible()
     }

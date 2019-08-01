@@ -1,20 +1,10 @@
-// minues-ios-app
+// NewSiteView.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 7/23/19.
+// Created by Leo Dion on 8/1/19.
 
 import Combine
 import Minues
 import SwiftUI
-
-class ContentEntryBindableObject: Identifiable, ObservableObject {
-  init(publisher: AnyPublisher<ContentEntry, Error>) {
-    self.publisher = publisher
-    // publisher.subscribe(self.objectWillChange)
-  }
-
-  let publisher: AnyPublisher<ContentEntry, Error>
-  let subject = PassthroughSubject<ContentEntry, Error>()
-}
 
 struct NewSiteView: View {
   var readyForBuild: Bool {

@@ -5,5 +5,6 @@
 import Foundation
 
 public protocol ContentEntryFactoryProtocol {
-  func contentEntry(fromMarkdown markdown: String, withDestinationDirectory destinationURL: URL) throws -> ContentEntryProtocol
+  associatedtype ContentEntryType : ContentEntryProtocol
+  func saveContentEntry(fromMarkdown markdown: String, withDestinationDirectory destinationURL: URL) throws -> ContentEntryType
 }

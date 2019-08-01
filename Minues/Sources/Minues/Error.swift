@@ -15,4 +15,8 @@ struct NoDataError: Error {}
 
 public enum MinuesError: Error {
   case invalidState
+  case invalidData
+  case missingTitle
+  case notImplemented
+  case noDocumentDirectory
 }

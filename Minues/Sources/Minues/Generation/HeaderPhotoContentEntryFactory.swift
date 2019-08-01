@@ -4,12 +4,16 @@
 
 import Foundation
 public struct HeaderPhotoContentEntryFactory: ContentEntryFactoryProtocol {
+
+  
+  public typealias ContentEntryType = ContentEntry
+  
   let imageURLProvider: ImageURLProvider
   public init(imageURLProvider: ImageURLProvider? = nil) {
     self.imageURLProvider = imageURLProvider ?? PicsumPhotoURLProvider()
   }
 
-  public func contentEntry(fromMarkdown markdown: String, withDestinationDirectory destinationURL: URL) throws -> ContentEntryProtocol {
+  public func saveContentEntry(fromMarkdown markdown: String, withDestinationDirectory destinationURL: URL) throws -> ContentEntryType {
     var foundTitle: String?
     var newMarkdown = markdown
     let results = markdown =~ "(#+)\\s(.+)"
@@ -41,6 +45,8 @@ public struct HeaderPhotoContentEntryFactory: ContentEntryFactoryProtocol {
       categories: ["a", "b", "c"],
       coverImage: imageURLProvider.imageUrl(withSize: Size(width: 1920, height: 960)) // URL(string: String(format: photoURLTemplate, Int.random(in: 1 ... 1000), 1920, 960))!
     )
-    return ContentEntry(frontMatter: frontMatter, content: newMarkdown, url: fileURL)
+    let entry = ContentEntry(frontMatter: frontMatter, content: newMarkdown, url: fileURL)
+    try entry.save()
+    return entry
   }
 }

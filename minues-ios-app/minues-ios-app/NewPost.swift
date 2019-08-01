@@ -6,29 +6,43 @@ import Combine
 import Minues
 import SwiftUI
 
+typealias ContentEntryPublisher = AnyPublisher<Result<ContentEntry, Error>?, Never>
+
 class ContentEntryBindableObject: Identifiable, ObservableObject {
-  init(publisher: AnyPublisher<ContentEntry, Error>) {
+  init(publisher: ContentEntryPublisher) {
     self.publisher = publisher
+    publisher.assign(to: \ContentEntryBindableObject.result, on: self)
     // publisher.subscribe(self.objectWillChange)
-    publisher.subscribe(subject)
+    // publisher.subscribe(subject)
   }
 
-  let publisher: AnyPublisher<ContentEntry, Error>
-  var subject = PassthroughSubject<ContentEntry, Error>()
-
-  var objectWillChange = ObservableObjectPublisher()
+  let publisher: ContentEntryPublisher
+  @Published var result: Result<ContentEntry, Error>? = nil
 }
 
 struct NewPost: View {
   var body: some View {
-    Text("\(contentEntry.debugDescription ?? "empty")").onReceive(self.publisher) { result in
-      self.contentEntry = result
-    }
+    Text("\(postData.result.debugDescription ?? "empty")")
   }
 
-  @State var contentEntry: Result<ContentEntry, Error>? = nil
+  @ObservedObject var postData: ContentEntryBindableObject
 
-  var publisher: AnyPublisher<Result<ContentEntry, Error>?, Never> {
+//  var publisher: AnyPublisher<Result<ContentEntry, Error>?, Never> {
+//    let temporaryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+//    let generator = DownloadGenerator(destinationUrl: temporaryURL, factory: HeaderPhotoContentEntryFactory())
+//    let publisher = generator.publisher().map {
+//      Result<ContentEntry, Error>.success($0)
+//    }.catch { error in
+//      Just(Result<ContentEntry, Error>.failure(error))
+//    }.map {
+//      result -> Result<ContentEntry, Error>? in
+//      result
+//    }
+//    let assignment = publisher.receive(on: DispatchQueue.main).assign(to: \NewPost.contentEntry, on: self)
+//
+//    return publisher.eraseToAnyPublisher()
+//  }
+  init() {
     let temporaryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
     let generator = DownloadGenerator(destinationUrl: temporaryURL, factory: HeaderPhotoContentEntryFactory())
     let publisher = generator.publisher().map {
@@ -39,9 +53,7 @@ struct NewPost: View {
       result -> Result<ContentEntry, Error>? in
       result
     }
-    let assignment = publisher.receive(on: DispatchQueue.main).assign(to: \NewPost.contentEntry, on: self)
-
-    return publisher.eraseToAnyPublisher()
+    postData = ContentEntryBindableObject(publisher: publisher.eraseToAnyPublisher())
   }
 }
 

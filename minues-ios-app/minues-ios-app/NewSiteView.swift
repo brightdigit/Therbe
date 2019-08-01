@@ -11,12 +11,12 @@ struct NewSiteView: View {
     return !siteTitle.isEmpty
   }
 
-  @ObservedObject var entryObject: ContentEntryBindableObject = {
-    let temporaryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-    let generator = DownloadGenerator(destinationUrl: temporaryURL, factory: HeaderPhotoContentEntryFactory())
-
-    return ContentEntryBindableObject(publisher: generator.publisher())
-  }()
+//  @ObservedObject var entryObject: ContentEntryBindableObject = {
+//    let temporaryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+//    let generator = DownloadGenerator(destinationUrl: temporaryURL, factory: HeaderPhotoContentEntryFactory())
+//
+//    return ContentEntryBindableObject(publisher: generator.publisher())
+//  }()
 
   @State var siteBuiling = false
   @State var siteTitle: String = ""

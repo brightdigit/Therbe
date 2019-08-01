@@ -1,13 +1,11 @@
-// HeaderPhotoContentEntryFactory.swift
+// Sources
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 7/31/19.
+// Created by Leo Dion on 7/23/19.
 
 import Foundation
 public struct HeaderPhotoContentEntryFactory: ContentEntryFactoryProtocol {
-
-  
   public typealias ContentEntryType = ContentEntry
-  
+
   let imageURLProvider: ImageURLProvider
   public init(imageURLProvider: ImageURLProvider? = nil) {
     self.imageURLProvider = imageURLProvider ?? PicsumPhotoURLProvider()

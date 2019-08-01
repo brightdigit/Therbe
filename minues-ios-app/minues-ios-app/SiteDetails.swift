@@ -1,6 +1,6 @@
-// SiteDetails.swift
+// minues-ios-app
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 7/31/19.
+// Created by Leo Dion on 7/23/19.
 
 import Minues
 import SwiftUI
@@ -85,8 +85,8 @@ struct SiteDetails: View {
     try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
     print(siteDirectoryUrl)
     let provider = PostCollectionProvider()
-    let generator = DownloadGenerator(destinationUrl: siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true))
-    let task = provider.generate(100, using: generator)
+    let generator = DownloadGenerator(destinationUrl: siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true), factory: HeaderPhotoContentEntryFactory())
+    // let task = provider.generate(100, using: generator)
 
     // _ = DeprecatedPostCollectionGenerator.generate(100, markdownFilesAt: postsUrl) { result in
 //      let urls = try? FileManager.default.contentsOfDirectory(at: siteDirectoryUrl, includingPropertiesForKeys: [.isDirectoryKey], options: FileManager.DirectoryEnumerationOptions.init()).filter{

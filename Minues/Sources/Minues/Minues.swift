@@ -1,6 +1,6 @@
-// Minues.swift
+// Sources
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 7/31/19.
+// Created by Leo Dion on 7/23/19.
 
 import Down
 import Foundation
@@ -415,17 +415,17 @@ public struct Minues {
     try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
   }
 
-  public func setupSite(_ site: Site, withTheme theme: Theme, _ completed: @escaping (Error?) -> Void) {
+  public func setupSite(_ site: Site, withTheme theme: Theme, _: @escaping (Error?) -> Void) {
     copyTheme(theme, forSite: site)
 
     let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
     let provider = PostCollectionProvider()
-    let generator = DownloadGenerator(destinationUrl: postsUrl)
-    var task = provider.generate(100, using: generator)
-    task.completion { result in
-      completed(result.error)
-    }
-    task.resume()
+//    let generator = DownloadGenerator(destinationUrl: postsUrl)
+//    var task = provider.generate(100, using: generator)
+//    task.completion { result in
+//      completed(result.error)
+//    }
+//    task.resume()
 //    _ = DeprecatedPostCollectionGenerator.generate(100, markdownFilesAt: postsUrl) { result in
 //
 //    }

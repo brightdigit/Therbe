@@ -1,6 +1,6 @@
-// minues-ios-app
+// NewSiteView.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 7/23/19.
+// Created by Leo Dion on 8/1/19.
 
 import Minues
 import SwiftUI
@@ -78,7 +78,9 @@ struct NewSiteView: View {
       return
     }
     let site = Site(title: siteTitle)
-
+    let temporaryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+    let generator = DownloadGenerator(destinationUrl: temporaryURL, factory: HeaderPhotoContentEntryFactory())
+    generator.publisher()
     // copy theme template
     // generate posts
     // organize files into operations

@@ -11,13 +11,17 @@ typealias ContentEntryPublisher = AnyPublisher<Result<ContentEntry, Error>?, Nev
 class ContentEntryBindableObject: Identifiable, ObservableObject {
   init(publisher: ContentEntryPublisher) {
     self.publisher = publisher
-    publisher.assign(to: \ContentEntryBindableObject.result, on: self)
+    publisher.receive(on: DispatchQueue.main).assign(to: \ContentEntryBindableObject.result, on: self)
     // publisher.subscribe(self.objectWillChange)
     // publisher.subscribe(subject)
   }
 
   let publisher: ContentEntryPublisher
-  @Published var result: Result<ContentEntry, Error>? = nil
+  @Published var result: Result<ContentEntry, Error>? = nil {
+    willSet {
+      objectWillChange.send()
+    }
+  }
 }
 
 struct NewPost: View {

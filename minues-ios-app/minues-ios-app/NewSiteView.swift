@@ -1,14 +1,32 @@
-// NewSiteView.swift
+// minues-ios-app
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 8/1/19.
+// Created by Leo Dion on 7/23/19.
 
+import Combine
 import Minues
 import SwiftUI
+
+class ContentEntryBindableObject: Identifiable, ObservableObject {
+  init(publisher: AnyPublisher<ContentEntry, Error>) {
+    self.publisher = publisher
+    // publisher.subscribe(self.objectWillChange)
+  }
+
+  let publisher: AnyPublisher<ContentEntry, Error>
+  let subject = PassthroughSubject<ContentEntry, Error>()
+}
 
 struct NewSiteView: View {
   var readyForBuild: Bool {
     return !siteTitle.isEmpty
   }
+
+  @ObservedObject var entryObject: ContentEntryBindableObject = {
+    let temporaryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+    let generator = DownloadGenerator(destinationUrl: temporaryURL, factory: HeaderPhotoContentEntryFactory())
+
+    return ContentEntryBindableObject(publisher: generator.publisher())
+  }()
 
   @State var siteBuiling = false
   @State var siteTitle: String = ""
@@ -80,7 +98,8 @@ struct NewSiteView: View {
     let site = Site(title: siteTitle)
     let temporaryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
     let generator = DownloadGenerator(destinationUrl: temporaryURL, factory: HeaderPhotoContentEntryFactory())
-    generator.publisher()
+    let publisher = generator.publisher()
+
     // copy theme template
     // generate posts
     // organize files into operations

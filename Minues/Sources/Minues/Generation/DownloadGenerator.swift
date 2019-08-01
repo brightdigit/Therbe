@@ -30,9 +30,9 @@ public struct DownloadGenerator<
     return publisher.eraseToAnyPublisher()
   }
 
-//  public func next() -> PostGenerationTaskProtocol {
+  //  public func next() -> PostGenerationTaskProtocol {
 //    return DownloadGenerationTask(sourceURL: downloadURLGenerator(), destinationURL: destinationUrl)
-//  }
+  //  }
 
   let destinationUrl: URL
   let downloadURLGenerator: () -> URL

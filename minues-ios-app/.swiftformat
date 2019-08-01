@@ -12,3 +12,4 @@
 --ifdef indent 
 --hexliterals uppercase 
 --semicolons inline
+--disable redundantNilInit

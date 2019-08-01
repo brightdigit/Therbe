@@ -79,7 +79,7 @@ struct DirectoryList: View {
      )*/
   }
 
-//  func process() {
+  //  func process() {
 //    let minues = Minues()
 //
 //    guard let result = self.result else {
@@ -115,9 +115,9 @@ struct DirectoryList: View {
 //    }
 //
 //    group.notify(queue: .main) {}
-//  }
+  //  }
 
-//  var list: some View {
+  //  var list: some View {
 //    let items = self.result.flatMap { try? $0.get() }
 //
 //    return items.map { entries in
@@ -131,7 +131,7 @@ struct DirectoryList: View {
 //      }
 //    }
 //
-//  }
+  //  }
 
   var emptyText: some View {
     let items = self.result.flatMap { try? $0.get() }.flatMap { $0.count == 0 ? $0 : nil }

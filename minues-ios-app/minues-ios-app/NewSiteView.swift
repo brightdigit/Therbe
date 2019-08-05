@@ -95,7 +95,18 @@ struct NewSiteView: View {
 //      let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
 //      builder.build(fromSourceDirectory: site.documentsURL, toDestinationDirectory: destinationURL, self.onProgress, completed: self.onCompleted)
 //    }
-    let future = minues.setupSite(site, withTheme: theme, using: eventLoop)
+    let future = minues.setupSite(site, withTheme: theme, using: eventLoop).flatMap {
+      site -> EventLoopFuture<Void> in
+      let builder = Builder()
+      let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+      return builder.build(fromSourceDirectory: site.documentsURL, toDestinationDirectory: destinationURL, using: eventLoop)
+    }.map {
+      site
+    }
+
+    future.whenComplete {
+      self.onCompleted($0.error)
+    }
   }
 
   func onProgress(_: BuilderProgress) {}

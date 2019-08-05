@@ -461,8 +461,10 @@ extension Minues {
 //    }
 //    task.resume()
     let promiseWithError = eventLoop.makePromise(of: Error?.self)
-    setupSite(site, withTheme: theme) { error in
-      promiseWithError.succeed(error)
+    eventLoop.execute {
+      self.setupSite(site, withTheme: theme) { error in
+        promiseWithError.succeed(error)
+      }
     }
 
     let promise = promiseWithError.futureResult.flatMapThrowing { (error) -> (Site) in
@@ -474,8 +476,23 @@ extension Minues {
 
     return promise
   }
+}
 
-  public func build(fromSourceDirectory _: URL, toDestinationDirectory _: URL, using _: EventLoop) {
-    // self.build(fromSourceDirectory: sourceURL, toDestinationDirectory: destinationURL, using: eventLoop)
+extension Builder {
+  public func build(fromSourceDirectory sourceURL: URL, toDestinationDirectory destinationURL: URL, using eventLoop: EventLoop) -> EventLoopFuture<Void> {
+    let promise = eventLoop.makePromise(of: Void.self)
+    eventLoop.execute {
+      self.build(fromSourceDirectory: sourceURL, toDestinationDirectory: destinationURL, { _ in
+
+      }) { error in
+        if let error = error {
+          promise.fail(error)
+        } else {
+          promise.succeed(())
+        }
+      }
+    }
+
+    return promise.futureResult
   }
 }

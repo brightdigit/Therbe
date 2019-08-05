@@ -1,9 +1,10 @@
 // Minues.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 7/31/19.
+// Created by Leo Dion.
 
 import Down
 import Foundation
+import NIO
 import PathKit
 import Stencil
 import Yams
@@ -426,9 +427,6 @@ public struct Minues {
       completed(result.error)
     }
     task.resume()
-//    _ = DeprecatedPostCollectionGenerator.generate(100, markdownFilesAt: postsUrl) { result in
-//
-//    }
   }
 
   fileprivate func componentsFromMarkdown(_ text: String) throws -> (frontMatter: Any?, content: String) {
@@ -447,5 +445,37 @@ public struct Minues {
     } else {
       return (frontMatter: nil, content: text)
     }
+  }
+}
+
+extension Minues {
+  public func setupSite(_ site: Site, withTheme theme: Theme, using eventLoop: EventLoop) -> EventLoopFuture<Site> {
+//    copyTheme(theme, forSite: site)
+//
+//    let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
+//    let provider = PostCollectionProvider()
+//    let generator = DownloadGenerator(destinationUrl: postsUrl)
+//    var task = provider.generate(100, using: generator)
+//    task.completion { result in
+//      completed(result.error)
+//    }
+//    task.resume()
+    let promiseWithError = eventLoop.makePromise(of: Error?.self)
+    setupSite(site, withTheme: theme) { error in
+      promiseWithError.succeed(error)
+    }
+
+    let promise = promiseWithError.futureResult.flatMapThrowing { (error) -> (Site) in
+      if let error = error {
+        throw error
+      }
+      return site
+    }
+
+    return promise
+  }
+
+  public func build(fromSourceDirectory _: URL, toDestinationDirectory _: URL, using _: EventLoop) {
+    // self.build(fromSourceDirectory: sourceURL, toDestinationDirectory: destinationURL, using: eventLoop)
   }
 }

@@ -1,8 +1,9 @@
 // NewSiteView.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 7/31/19.
+// Created by Leo Dion.
 
 import Minues
+import NIO
 import SwiftUI
 
 struct NewSiteView: View {
@@ -13,7 +14,7 @@ struct NewSiteView: View {
   @State var siteBuiling = false
   @State var siteTitle: String = ""
   @State var pickedThemeIndex = 0
-  @State var themes: Result<[Theme], Error>?
+  @State var themes: Result<[Theme], Error>? = nil
   let loadingDirectoryUrl: URL = Bundle.main.url(forResource: "themes", withExtension: nil)!
   var body: some View {
     ZStack {
@@ -79,18 +80,22 @@ struct NewSiteView: View {
     }
     let site = Site(title: siteTitle)
 
+    let pool = MultiThreadedEventLoopGroup(numberOfThreads: 5)
+    let eventLoop = pool.next()
+
     // copy theme template
     // generate posts
     // organize files into operations
     // execute actions on file sets
-    minues.setupSite(site, withTheme: theme) { error in
-      if let error = error {
-        return
-      }
-      let builder = Builder()
-      let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-      builder.build(fromSourceDirectory: site.documentsURL, toDestinationDirectory: destinationURL, self.onProgress, completed: self.onCompleted)
-    }
+//    minues.setupSite(site, withTheme: theme) { error in
+//      if let error = error {
+//        return
+//      }
+//      let builder = Builder()
+//      let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+//      builder.build(fromSourceDirectory: site.documentsURL, toDestinationDirectory: destinationURL, self.onProgress, completed: self.onCompleted)
+//    }
+    let future = minues.setupSite(site, withTheme: theme, using: eventLoop)
   }
 
   func onProgress(_: BuilderProgress) {}

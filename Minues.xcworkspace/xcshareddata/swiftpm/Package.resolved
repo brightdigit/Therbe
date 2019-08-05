@@ -38,6 +38,15 @@
         }
       },
       {
+        "package": "swift-nio",
+        "repositoryURL": "https://github.com/apple/swift-nio.git",
+        "state": {
+          "branch": null,
+          "revision": "b07efecaea7359054b8a85d357f05c8152b7716c",
+          "version": "2.6.0"
+        }
+      },
+      {
         "package": "Yams",
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {

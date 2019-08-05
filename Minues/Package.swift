@@ -15,6 +15,7 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0"),
         .package(url: "https://github.com/stencilproject/Stencil.git", from: "0.13.1"),
+        .package(url: "https://github.com/apple/swift-nio.git", from: "2.0.0"),
         .package(url: "https://github.com/brightdigit/Down.git", .branch("master"))
 
     ],
@@ -23,7 +24,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "Minues",
-            dependencies: ["Yams", "Stencil", "Down"]),
+            dependencies: ["Yams", "Stencil", "Down", "NIO"]),
         .testTarget(
             name: "MinuesTests",
             dependencies: ["Minues"]),

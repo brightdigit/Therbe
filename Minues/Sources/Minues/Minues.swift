@@ -4,8 +4,8 @@
 
 import Down
 import Foundation
-import NIO
 import PathKit
+import Promises
 import Stencil
 import Yams
 
@@ -449,7 +449,7 @@ public struct Minues {
 }
 
 extension Minues {
-  public func setupSite(_ site: Site, withTheme theme: Theme, using eventLoop: EventLoop) -> EventLoopFuture<Site> {
+  public func setupSite(_ site: Site, withTheme theme: Theme, on queue: DispatchQueue = .main) -> Promise<Site> {
 //    copyTheme(theme, forSite: site)
 //
 //    let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
@@ -460,39 +460,31 @@ extension Minues {
 //      completed(result.error)
 //    }
 //    task.resume()
-    let promiseWithError = eventLoop.makePromise(of: Error?.self)
-    eventLoop.execute {
+
+    return Promise<Site>(on: queue) { success, failure in
       self.setupSite(site, withTheme: theme) { error in
-        promiseWithError.succeed(error)
+        if let error = error {
+          failure(error)
+        } else {
+          success(site)
+        }
       }
     }
-
-    let promise = promiseWithError.futureResult.flatMapThrowing { (error) -> (Site) in
-      if let error = error {
-        throw error
-      }
-      return site
-    }
-
-    return promise
   }
 }
 
 extension Builder {
-  public func build(fromSourceDirectory sourceURL: URL, toDestinationDirectory destinationURL: URL, using eventLoop: EventLoop) -> EventLoopFuture<Void> {
-    let promise = eventLoop.makePromise(of: Void.self)
-    eventLoop.execute {
+  public func build(fromSourceDirectory sourceURL: URL, toDestinationDirectory destinationURL: URL, on queue: DispatchQueue = .main) -> Promise<Void> {
+    return Promise(on: queue) { success, failure in
       self.build(fromSourceDirectory: sourceURL, toDestinationDirectory: destinationURL, { _ in
 
       }) { error in
         if let error = error {
-          promise.fail(error)
+          failure(error)
         } else {
-          promise.succeed(())
+          success(())
         }
       }
     }
-
-    return promise.futureResult
   }
 }

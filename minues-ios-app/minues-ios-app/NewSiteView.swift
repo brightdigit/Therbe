@@ -3,7 +3,7 @@
 // Created by Leo Dion.
 
 import Minues
-import NIO
+import Promises
 import SwiftUI
 
 struct NewSiteView: View {
@@ -80,32 +80,15 @@ struct NewSiteView: View {
     }
     let site = Site(title: siteTitle)
 
-    let pool = MultiThreadedEventLoopGroup(numberOfThreads: 5)
-    let eventLoop = pool.next()
-
-    // copy theme template
-    // generate posts
-    // organize files into operations
-    // execute actions on file sets
-//    minues.setupSite(site, withTheme: theme) { error in
-//      if let error = error {
-//        return
-//      }
-//      let builder = Builder()
-//      let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-//      builder.build(fromSourceDirectory: site.documentsURL, toDestinationDirectory: destinationURL, self.onProgress, completed: self.onCompleted)
-//    }
-    let future = minues.setupSite(site, withTheme: theme, using: eventLoop).flatMap {
-      site -> EventLoopFuture<Void> in
-      let builder = Builder()
+    minues.setupSite(site, withTheme: theme).then { (site) -> Promise<Void> in
       let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-      return builder.build(fromSourceDirectory: site.documentsURL, toDestinationDirectory: destinationURL, using: eventLoop)
-    }.map {
-      site
-    }
-
-    future.whenComplete {
-      self.onCompleted($0.error)
+      let builder = Builder()
+      return builder.build(fromSourceDirectory: site.documentsURL, toDestinationDirectory: destinationURL)
+      // return builder.buildPromise(fromSourceDirectory: , toDestinationDirectory: T##URL)
+    }.catch { error in
+      self.onCompleted(error)
+    }.then {
+      self.onCompleted(nil)
     }
   }
 

@@ -420,13 +420,18 @@ public struct Minues {
     copyTheme(theme, forSite: site)
 
     let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
-    let provider = PostCollectionProvider()
+    let provider = PostCollectionPromiseProvider()
     let generator = DownloadGenerator(destinationUrl: postsUrl)
-    var task = provider.generate(100, using: generator)
-    task.completion { result in
-      completed(result.error)
+    let promise = provider.promise(100, postsUsing: generator)
+
+    promise.catch(completed).then { _ in
+      completed(nil)
     }
-    task.resume()
+//    var task = provider.generate(100, using: generator)
+//    task.completion { result in
+//      completed(result.error)
+//    }
+//    task.resume()
   }
 
   fileprivate func componentsFromMarkdown(_ text: String) throws -> (frontMatter: Any?, content: String) {

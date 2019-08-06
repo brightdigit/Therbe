@@ -1,7 +1,7 @@
 --indent 2 
 --allman false 
 --removelines enabled 
---header "{file}\nCopyright (c) {year} BrightDigit\nCreated by Leo Dion on {created}."
+--header "{file}\nCopyright (c) {year} BrightDigit\nCreated by Leo Dion."
 --insertlines disabled 
 --empty void 
 --ranges spaced 
@@ -12,3 +12,4 @@
 --ifdef indent 
 --hexliterals uppercase 
 --semicolons inline
+--disable redundantNilInit

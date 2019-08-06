@@ -1,6 +1,6 @@
 // SiteDetails.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 7/31/19.
+// Created by Leo Dion.
 
 import Minues
 import SwiftUI
@@ -84,7 +84,7 @@ struct SiteDetails: View {
     try? FileManager.default.createDirectory(at: Directories.shared.sitesDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
     try? FileManager.default.copyItem(at: themeDirectoryUrl, to: siteDirectoryUrl)
     print(siteDirectoryUrl)
-    let provider = PostCollectionProvider()
+    let provider = PostCollectionTaskProvider()
     let generator = DownloadGenerator(destinationUrl: siteDirectoryUrl.appendingPathComponent("_posts", isDirectory: true))
     let task = provider.generate(100, using: generator)
 

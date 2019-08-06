@@ -1,6 +1,6 @@
 // NewSiteView.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 7/31/19.
+// Created by Leo Dion.
 
 import Minues
 import SwiftUI
@@ -13,7 +13,7 @@ struct NewSiteView: View {
   @State var siteBuiling = false
   @State var siteTitle: String = ""
   @State var pickedThemeIndex = 0
-  @State var themes: Result<[Theme], Error>?
+  @State var themes: Result<[Theme], Error>? = nil
   let loadingDirectoryUrl: URL = Bundle.main.url(forResource: "themes", withExtension: nil)!
   var body: some View {
     ZStack {

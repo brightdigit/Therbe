@@ -7,6 +7,7 @@ import Foundation
 import PathKit
 import Stencil
 import Yams
+// import Promises
 
 public struct BuilderProgress {}
 
@@ -419,7 +420,7 @@ public struct Minues {
     copyTheme(theme, forSite: site)
 
     let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
-    let provider = PostCollectionProvider()
+    let provider = PostCollectionTaskProvider()
     let generator = DownloadGenerator(destinationUrl: postsUrl)
     var task = provider.generate(100, using: generator)
     task.completion { result in
@@ -449,3 +450,44 @@ public struct Minues {
     }
   }
 }
+
+// extension Minues {
+//  public func setupSite(_ site: Site, withTheme theme: Theme, on queue: DispatchQueue = .main) -> Promise<Site> {
+////    copyTheme(theme, forSite: site)
+////
+////    let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
+////    let provider = PostCollectionProvider()
+////    let generator = DownloadGenerator(destinationUrl: postsUrl)
+////    var task = provider.generate(100, using: generator)
+////    task.completion { result in
+////      completed(result.error)
+////    }
+////    task.resume()
+//
+//    return Promise<Site>(on: queue) { success, failure in
+//      self.setupSite(site, withTheme: theme) { error in
+//        if let error = error {
+//          failure(error)
+//        } else {
+//          success(site)
+//        }
+//      }
+//    }
+//  }
+// }
+//
+// extension Builder {
+//  public func build(fromSourceDirectory sourceURL: URL, toDestinationDirectory destinationURL: URL, on queue: DispatchQueue = .main) -> Promise<Void> {
+//    return Promise(on: queue) { success, failure in
+//      self.build(fromSourceDirectory: sourceURL, toDestinationDirectory: destinationURL, { _ in
+//
+//      }) { error in
+//        if let error = error {
+//          failure(error)
+//        } else {
+//          success(())
+//        }
+//      }
+//    }
+//  }
+// }

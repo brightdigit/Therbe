@@ -1,6 +1,6 @@
 // NewSiteView.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 8/1/19.
+// Created by Leo Dion.
 
 import Combine
 import Minues
@@ -87,7 +87,9 @@ struct NewSiteView: View {
     }
     let site = Site(title: siteTitle)
     let temporaryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+
     let generator = DownloadGenerator(destinationUrl: temporaryURL, factory: HeaderPhotoContentEntryFactory())
+
     let publisher = generator.publisher()
 
     // copy theme template

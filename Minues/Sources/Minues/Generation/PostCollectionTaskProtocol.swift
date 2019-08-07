@@ -1,8 +1,6 @@
 // PostCollectionTaskProtocol.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 8/1/19.
-
-import Combine
+// Created by Leo Dion.
 
 public protocol PostCollectionTaskProtocol {
   mutating func completion(_ completion: @escaping (ResultList<ContentEntryProtocol>) -> Void)

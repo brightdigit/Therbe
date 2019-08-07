@@ -1,6 +1,6 @@
 // HeaderPhotoContentEntryFactory.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 8/1/19.
+// Created by Leo Dion.
 
 import Foundation
 public struct HeaderPhotoContentEntryFactory: ContentEntryFactoryProtocol {

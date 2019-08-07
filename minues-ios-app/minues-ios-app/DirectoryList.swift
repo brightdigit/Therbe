@@ -1,6 +1,6 @@
 // DirectoryList.swift
 // Copyright (c) 2019 BrightDigit
-// Created by Leo Dion on 8/1/19.
+// Created by Leo Dion.
 
 import Minues
 import SwiftUI

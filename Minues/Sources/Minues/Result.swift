@@ -22,3 +22,25 @@ public extension Result {
     }
   }
 }
+
+extension Array {
+  func flatten<Success>() -> ResultList<Success> where Element == Result<Success, Error> {
+    var successes = [Success]()
+    var failures = [Error]()
+
+    for item in self {
+      switch item {
+      case let .success(value):
+        successes.append(value)
+      case let .failure(error):
+        failures.append(error)
+      }
+    }
+
+    if failures.count > 0 {
+      return .failure(failures)
+    } else {
+      return .success(successes)
+    }
+  }
+}

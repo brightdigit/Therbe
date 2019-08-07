@@ -4,8 +4,15 @@
 
 // import Promises
 
+import Foundation
 public protocol PostGeneratorProtocol {
   func next() -> PostGenerationTaskProtocol
+}
+
+extension PostGeneratorProtocol {
+  func operation() -> Operation {
+    return PostGenerationOperation(task: next())
+  }
 }
 
 //

@@ -79,18 +79,24 @@ struct NewSiteView: View {
     }
     let site = Site(title: siteTitle)
 
+    let operation = minues.setupOperation(forSite: site, withTheme: theme)
+    operation.completionBlock = {
+      self.onCompleted(nil)
+    }
+    OperationQueue.main.addOperations(operation.dependencies, waitUntilFinished: false)
+    OperationQueue.main.addOperation(operation)
     // copy theme template
     // generate posts
     // organize files into operations
     // execute actions on file sets
-    minues.setupSite(site, withTheme: theme) { error in
-      if let error = error {
-        return
-      }
-      let builder = Builder()
-      let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-      builder.build(fromSourceDirectory: site.documentsURL, toDestinationDirectory: destinationURL, self.onProgress, completed: self.onCompleted)
-    }
+//    minues.setupSite(site, withTheme: theme) { error in
+//      if let error = error {
+//        return
+//      }
+//      let builder = Builder()
+//      let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+//      builder.build(fromSourceDirectory: site.documentsURL, toDestinationDirectory: destinationURL, self.onProgress, completed: self.onCompleted)
+//    }
   }
 
   func onProgress(_: BuilderProgress) {}

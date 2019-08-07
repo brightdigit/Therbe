@@ -432,6 +432,16 @@ public struct Minues {
 //    }
   }
 
+  public func setupOperation(forSite site: Site, withTheme theme: Theme) -> Operation {
+    copyTheme(theme, forSite: site)
+
+    let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
+    let provider = PostCollectionOperationProvider()
+    let generator = DownloadGenerator(destinationUrl: postsUrl)
+    var operation = provider.operation(100, postsUsing: generator)
+    return operation
+  }
+
   fileprivate func componentsFromMarkdown(_ text: String) throws -> (frontMatter: Any?, content: String) {
     let result = text =~ "^-{3}\n([\\s\\S]*?)\n-{3}\n"
     let ranges = result.first
@@ -491,3 +501,33 @@ public struct Minues {
 //    }
 //  }
 // }
+
+public class BuildOperation: AsyncOperation {
+  let builder: Builder
+  let sourceURL: URL
+  let destinationURL: URL
+  public private(set) var error: Error?
+  init(builder: Builder, sourceURL: URL, destinationURL: URL) {
+    self.builder = builder
+    self.sourceURL = sourceURL
+    self.destinationURL = destinationURL
+    super.init()
+  }
+
+  public override func main() {
+    isFinished = false
+    isExecuting = true
+    builder.build(fromSourceDirectory: sourceURL, toDestinationDirectory: destinationURL, { _ in
+    }) { error in
+      self.error = error
+      self.isFinished = true
+      self.isExecuting = false
+    }
+  }
+}
+
+extension Builder {
+  public func operation(fromSourceDirectory sourceURL: URL, toDestinationDirectory destinationURL: URL) -> BuildOperation {
+    return BuildOperation(builder: self, sourceURL: sourceURL, destinationURL: destinationURL)
+  }
+}

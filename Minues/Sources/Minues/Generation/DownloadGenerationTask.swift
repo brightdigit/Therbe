@@ -3,6 +3,32 @@
 // Created by Leo Dion.
 
 import Foundation
+typealias ContentEntryResult = Result<ContentEntryProtocol, Error>
+
+public class PostGenerationOperation: AsyncOperation {
+  var task: PostGenerationTaskProtocol
+  var result: ContentEntryResult?
+
+  public init(task: PostGenerationTaskProtocol) {
+    self.task = task
+    super.init()
+  }
+
+  public override func main() {
+    isFinished = false
+    isExecuting = true
+
+    task.completion(taskCompleted)
+    task.resume()
+  }
+
+  func taskCompleted(_ result: ContentEntryResult) {
+    self.result = result
+    isExecuting = false
+    isFinished = true
+  }
+}
+
 public class DownloadGenerationTask: PostGenerationTaskProtocol {
   public func resume() {
     task.resume()

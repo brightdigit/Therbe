@@ -450,31 +450,18 @@ public struct Minues {
 
 extension Minues {
   public func setupSite(_ site: Site, withTheme theme: Theme, using eventLoop: EventLoop) -> EventLoopFuture<Site> {
-//    copyTheme(theme, forSite: site)
-//
-//    let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
-//    let provider = PostCollectionProvider()
-//    let generator = DownloadGenerator(destinationUrl: postsUrl)
-//    var task = provider.generate(100, using: generator)
-//    task.completion { result in
-//      completed(result.error)
-//    }
-//    task.resume()
-    let promiseWithError = eventLoop.makePromise(of: Error?.self)
+    let promise = eventLoop.makePromise(of: Site.self)
     eventLoop.execute {
       self.setupSite(site, withTheme: theme) { error in
-        promiseWithError.succeed(error)
+        if let error = error {
+          promise.fail(error)
+        } else {
+          promise.succeed(site)
+        }
       }
     }
 
-    let promise = promiseWithError.futureResult.flatMapThrowing { (error) -> (Site) in
-      if let error = error {
-        throw error
-      }
-      return site
-    }
-
-    return promise
+    return promise.futureResult
   }
 }
 

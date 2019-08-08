@@ -83,18 +83,6 @@ struct NewSiteView: View {
     let pool = MultiThreadedEventLoopGroup(numberOfThreads: 5)
     let eventLoop = pool.next()
 
-    // copy theme template
-    // generate posts
-    // organize files into operations
-    // execute actions on file sets
-//    minues.setupSite(site, withTheme: theme) { error in
-//      if let error = error {
-//        return
-//      }
-//      let builder = Builder()
-//      let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-//      builder.build(fromSourceDirectory: site.documentsURL, toDestinationDirectory: destinationURL, self.onProgress, completed: self.onCompleted)
-//    }
     let future = minues.setupSite(site, withTheme: theme, using: eventLoop).flatMap {
       site -> EventLoopFuture<Void> in
       let builder = Builder()

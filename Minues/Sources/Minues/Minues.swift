@@ -455,17 +455,6 @@ public struct Minues {
 
 extension Minues {
   public func setupSite(_ site: Site, withTheme theme: Theme, on queue: DispatchQueue = .main) -> Promise<Site> {
-//    copyTheme(theme, forSite: site)
-//
-//    let postsUrl = site.documentsURL.appendingPathComponent("_posts", isDirectory: true)
-//    let provider = PostCollectionProvider()
-//    let generator = DownloadGenerator(destinationUrl: postsUrl)
-//    var task = provider.generate(100, using: generator)
-//    task.completion { result in
-//      completed(result.error)
-//    }
-//    task.resume()
-
     return Promise<Site>(on: queue) { success, failure in
       self.setupSite(site, withTheme: theme) { error in
         if let error = error {
